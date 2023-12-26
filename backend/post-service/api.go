@@ -10,8 +10,8 @@ import (
 )
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
-	w.WriteHeader(status)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }
 
@@ -31,11 +31,13 @@ func makeHTTPHandlerFunc(f apiFunc) http.HandlerFunc {
 
 type APIServer struct {
 	listenAddr string
+	store      Storage
 }
 
-func NewAPIServer(listenAddr string) *APIServer {
+func NewAPIServer(listenAddr string, store Storage) *APIServer {
 	return &APIServer{
 		listenAddr: listenAddr,
+		store:      store,
 	}
 }
 
@@ -44,7 +46,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/post", makeHTTPHandlerFunc(s.handlePost))
 
-	router.HandleFunc("/post/{id}", makeHTTPHandlerFunc(s.handleGetPost))
+	router.HandleFunc("/post/{id}", makeHTTPHandlerFunc(s.handleGetPostByID))
 
 	log.Println("JSON API server running on port: ", s.listenAddr)
 
@@ -53,7 +55,7 @@ func (s *APIServer) Run() {
 
 func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "GET" {
-		return s.handleGetPost(w, r)
+		return s.handleGetPosts(w, r)
 	}
 	if r.Method == "POST" {
 		return s.handleCreatePost(w, r)
@@ -64,14 +66,36 @@ func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 	return fmt.Errorf("method not allowed %s", r.Method)
 }
 
-func (s *APIServer) handleGetPost(w http.ResponseWriter, r *http.Request) error {
+func (s *APIServer) handleGetPosts(w http.ResponseWriter, r *http.Request) error {
+	posts, err := s.store.GetPosts()
+
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, posts)
+}
+
+func (s *APIServer) handleGetPostByID(w http.ResponseWriter, r *http.Request) error {
 	id := mux.Vars(r)["id"]
 
 	return WriteJSON(w, http.StatusOK, id)
 }
 
 func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	createPostReq := CreatePostRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&createPostReq); err != nil {
+		return err
+	}
+
+	post := NewPost(createPostReq.Caption, createPostReq.ImageURL, createPostReq.PosterID)
+	dbPost, err := s.store.CreatePost(post)
+
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, dbPost)
 }
 
 func (s *APIServer) handleDeletePost(w http.ResponseWriter, r *http.Request) error {
