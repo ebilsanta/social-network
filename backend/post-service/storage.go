@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	// "time"
-
 	_ "github.com/lib/pq"
 )
 
@@ -16,6 +14,7 @@ type Storage interface {
 	UpdatePost(*Post) error
 	GetPosts() ([]*Post, error)
 	GetPostByID(int) (*Post, error)
+	GetPostsByUserID(int) ([]*Post, error)
 }
 
 type PostgresStore struct {
@@ -45,7 +44,7 @@ func (s *PostgresStore) createPostTable() error {
 		id serial primary key,
 		caption varchar(2000),
 		image_url varchar(2000),
-		poster_id serial,
+		user_id serial,
 		created_at timestamp,
 		deleted_at timestamp
 	)`
@@ -55,7 +54,7 @@ func (s *PostgresStore) createPostTable() error {
 
 func (s *PostgresStore) CreatePost(post *Post) (*Post, error) {
 	statement := `
-		INSERT INTO post (caption, image_url, poster_id, created_at)
+		INSERT INTO post (caption, image_url, user_id, created_at)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
@@ -64,7 +63,7 @@ func (s *PostgresStore) CreatePost(post *Post) (*Post, error) {
 		statement,
 		post.Caption,
 		post.ImageURL,
-		post.PosterID,
+		post.UserID,
 		post.CreatedAt,
 	).Scan(&post.ID)
 
@@ -115,13 +114,30 @@ func (s *PostgresStore) GetPostByID(id int) (*Post, error) {
 	return nil, fmt.Errorf("post %d not found", id)
 }
 
+func (s *PostgresStore) GetPostsByUserID(id int) ([]*Post, error) {
+	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
+	rows, err := s.db.Query(statement, id)
+	if err != nil {
+		return nil, err
+	}
+	posts := []*Post{}
+	for rows.Next() {
+		post, err := scanIntoPost(rows)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
 func scanIntoPost(rows *sql.Rows) (*Post, error) {
 	post := Post{}
 	err := rows.Scan(
 		&post.ID,
 		&post.Caption,
 		&post.ImageURL,
-		&post.PosterID,
+		&post.UserID,
 		&post.CreatedAt,
 		&post.DeletedAt,
 	)

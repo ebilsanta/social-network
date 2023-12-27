@@ -16,16 +16,16 @@ type Post struct {
 	ID        int          `json:"id"`
 	Caption   string       `json:"caption"`
 	ImageURL  string       `json:"imageURL"`
-	PosterID  string       `json:"posterID"`
+	UserID    string       `json:"userID"`
 	CreatedAt time.Time    `json:"createdAt"`
 	DeletedAt sql.NullTime `json:"deletedAt"`
 }
 
-func NewPost(caption, imageURL, posterID string) *Post {
+func NewPost(caption, imageURL, userID string) *Post {
 	return &Post{
 		Caption:   caption,
 		ImageURL:  imageURL,
-		PosterID:  posterID,
+		UserID:  userID,
 		CreatedAt: time.Now().UTC(),
 	}
 }

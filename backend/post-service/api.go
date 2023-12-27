@@ -45,11 +45,13 @@ func NewAPIServer(listenAddr string, store Storage) *APIServer {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/post", makeHTTPHandlerFunc(s.handlePost))
+	router.HandleFunc("/posts", makeHTTPHandlerFunc(s.handlePost))
 
-	router.HandleFunc("/post/{id}", makeHTTPHandlerFunc(s.handlePostByID))
+	router.HandleFunc("/posts/{id}", makeHTTPHandlerFunc(s.handlePostByID))
 
-	log.Println("JSON API server running on port: ", s.listenAddr)
+	router.HandleFunc("/users/{id}/posts", makeHTTPHandlerFunc(s.handleGetPostsByUserID))
+
+	log.Println("Post service running on port: ", s.listenAddr)
 
 	http.ListenAndServe(s.listenAddr, router)
 }
@@ -124,6 +126,21 @@ func (s *APIServer) handleDeletePostByID(w http.ResponseWriter, r *http.Request)
 	}
 
 	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
+}
+
+func (s *APIServer) handleGetPostsByUserID(w http.ResponseWriter, r *http.Request) error {
+	id, err := getID(r)
+	if err != nil {
+		return err
+	}
+
+	posts, err := s.store.GetPostsByUserID(id)
+	if  err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, posts)
+
 }
 
 func getID(r *http.Request) (int, error) {
