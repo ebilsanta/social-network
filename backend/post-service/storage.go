@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	// "time"
+
 	_ "github.com/lib/pq"
 )
 
@@ -44,14 +46,14 @@ func (s *PostgresStore) createPostTable() error {
 		caption varchar(2000),
 		image_url varchar(2000),
 		poster_id serial,
-		created_at timestamp
+		created_at timestamp,
+		deleted_at timestamp
 	)`
 	_, err := s.db.Exec(query)
 	return err
 }
 
 func (s *PostgresStore) CreatePost(post *Post) (*Post, error) {
-	fmt.Printf("%+v\n", post)
 	statement := `
 		INSERT INTO post (caption, image_url, poster_id, created_at)
 		VALUES ($1, $2, $3, $4)
@@ -78,11 +80,13 @@ func (s *PostgresStore) UpdatePost(post *Post) error {
 }
 
 func (s *PostgresStore) DeletePost(id int) error {
-	return nil
+	statement := "UPDATE post SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1"
+	_, err := s.db.Query(statement, id)
+	return err
 }
 
 func (s *PostgresStore) GetPosts() ([]*Post, error) {
-	statement := "SELECT * FROM post"
+	statement := "SELECT * FROM post WHERE deleted_at IS NULL"
 	rows, err := s.db.Query(statement)
 
 	if err != nil {
@@ -90,22 +94,39 @@ func (s *PostgresStore) GetPosts() ([]*Post, error) {
 	}
 	posts := []*Post{}
 	for rows.Next() {
-		post := Post{}
-		err := rows.Scan(
-			&post.ID,
-			&post.Caption,
-			&post.ImageURL,
-			&post.PosterID,
-			&post.CreatedAt,
-		)
+		post, err := scanIntoPost(rows)
 		if err != nil {
 			return nil, err
 		}
-		posts = append(posts, &post)
+		posts = append(posts, post)
 	}
 	return posts, nil
 }
 
 func (s *PostgresStore) GetPostByID(id int) (*Post, error) {
-	return nil, nil
+	statement := "SELECT * FROM post WHERE id = $1 AND deleted_at IS NULL"
+	rows, err := s.db.Query(statement, id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		return scanIntoPost(rows)
+	}
+	return nil, fmt.Errorf("post %d not found", id)
+}
+
+func scanIntoPost(rows *sql.Rows) (*Post, error) {
+	post := Post{}
+	err := rows.Scan(
+		&post.ID,
+		&post.Caption,
+		&post.ImageURL,
+		&post.PosterID,
+		&post.CreatedAt,
+		&post.DeletedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &post, nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -18,7 +19,7 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 type apiFunc func(http.ResponseWriter, *http.Request) error
 
 type APIError struct {
-	Error string
+	Error string `json:"error"`
 }
 
 func makeHTTPHandlerFunc(f apiFunc) http.HandlerFunc {
@@ -46,7 +47,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/post", makeHTTPHandlerFunc(s.handlePost))
 
-	router.HandleFunc("/post/{id}", makeHTTPHandlerFunc(s.handleGetPostByID))
+	router.HandleFunc("/post/{id}", makeHTTPHandlerFunc(s.handlePostByID))
 
 	log.Println("JSON API server running on port: ", s.listenAddr)
 
@@ -60,9 +61,6 @@ func (s *APIServer) handlePost(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "POST" {
 		return s.handleCreatePost(w, r)
 	}
-	if r.Method == "DELETE" {
-		return s.handleDeletePost(w, r)
-	}
 	return fmt.Errorf("method not allowed %s", r.Method)
 }
 
@@ -74,12 +72,6 @@ func (s *APIServer) handleGetPosts(w http.ResponseWriter, r *http.Request) error
 	}
 
 	return WriteJSON(w, http.StatusOK, posts)
-}
-
-func (s *APIServer) handleGetPostByID(w http.ResponseWriter, r *http.Request) error {
-	id := mux.Vars(r)["id"]
-
-	return WriteJSON(w, http.StatusOK, id)
 }
 
 func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) error {
@@ -98,6 +90,47 @@ func (s *APIServer) handleCreatePost(w http.ResponseWriter, r *http.Request) err
 	return WriteJSON(w, http.StatusOK, dbPost)
 }
 
-func (s *APIServer) handleDeletePost(w http.ResponseWriter, r *http.Request) error {
-	return nil
+func (s *APIServer) handlePostByID(w http.ResponseWriter, r *http.Request) error {
+	if r.Method == "GET" {
+		return s.handleGetPostByID(w, r)
+	}
+	if r.Method == "DELETE" {
+		return s.handleDeletePostByID(w, r)
+	}
+	return fmt.Errorf("method not allowed %s", r.Method)
+}
+
+func (s *APIServer) handleGetPostByID(w http.ResponseWriter, r *http.Request) error {
+	id, err := getID(r)
+	if err != nil {
+		return err
+	}
+
+	post, err := s.store.GetPostByID(id)
+	if err != nil {
+		return err
+	}
+	return WriteJSON(w, http.StatusOK, post)
+}
+
+func (s *APIServer) handleDeletePostByID(w http.ResponseWriter, r *http.Request) error {
+	id, err := getID(r)
+	if err != nil {
+		return err
+	}
+
+	if err := s.store.DeletePost(id); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
+}
+
+func getID(r *http.Request) (int, error) {
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return id, fmt.Errorf("invalid id %s", idStr)
+	}
+	return id, nil
 }
