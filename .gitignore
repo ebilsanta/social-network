@@ -1,4 +1,10 @@
 .env
 tmp/
 bin/
+**/main
+
+# for local dev
 backend/post_service/
+backend/post-service/post_svc_data
+
+backend/follower_db/

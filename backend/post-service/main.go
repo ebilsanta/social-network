@@ -15,6 +15,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := NewAPIServer(os.Getenv("SERVER_PORT"), store)
+	server := NewAPIServer(":"+os.Getenv("SERVER_PORT"), store)
 	server.Run()
 }
