@@ -2,16 +2,10 @@ package main
 
 import (
 	"log"
-
-	"github.com/joho/godotenv"
+	"os"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	store, err := NewPostgresStore()
 	if err != nil {
 		log.Fatal(err)
@@ -21,6 +15,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := NewAPIServer(":3000", store)
+	server := NewAPIServer(os.Getenv("SERVER_PORT"), store)
 	server.Run()
 }

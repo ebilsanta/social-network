@@ -1,3 +1,4 @@
 .env
 tmp/
 bin/
+backend/post_service/

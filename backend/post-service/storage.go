@@ -22,8 +22,7 @@ type PostgresStore struct {
 }
 
 func NewPostgresStore() (*PostgresStore, error) {
-	connStr := os.Getenv("POSTGRES_CONN_STR")
-	db, err := sql.Open("postgres", connStr)
+	db, err := connectToDB()
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +32,16 @@ func NewPostgresStore() (*PostgresStore, error) {
 	}
 
 	return &PostgresStore{db: db}, nil
+}
+
+func connectToDB() (*sql.DB, error) {
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	connStr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable", dbUser, dbName, dbPassword, dbHost, dbPort)
+	return sql.Open("postgres", connStr)
 }
 
 func (s *PostgresStore) Init() error {

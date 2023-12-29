@@ -51,7 +51,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/users/{id}/posts", makeHTTPHandlerFunc(s.handleGetPostsByUserID))
 
-	log.Println("Post service running on port: ", s.listenAddr)
+	log.Println("Post service running on port:", s.listenAddr)
 
 	http.ListenAndServe(s.listenAddr, router)
 }
@@ -135,7 +135,7 @@ func (s *APIServer) handleGetPostsByUserID(w http.ResponseWriter, r *http.Reques
 	}
 
 	posts, err := s.store.GetPostsByUserID(id)
-	if  err != nil {
+	if err != nil {
 		return err
 	}
 
