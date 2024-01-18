@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -30,8 +31,12 @@ func NewGraphStore() (*GraphStore, error) {
 func connectToDB() (*neo4j.DriverWithContext, error) {
 	ctx := context.Background()
 	dbUri := os.Getenv("DB_URI")
-	dbUser := os.Getenv("DB_NAME")
+	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
+	fmt.Println("credentials:")
+	fmt.Println(dbUri)
+	fmt.Println(dbUser)
+	fmt.Println(dbPassword)
 	driver, _ := neo4j.NewDriverWithContext(
 		dbUri,
 		neo4j.BasicAuth(dbUser, dbPassword, ""))

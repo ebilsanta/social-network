@@ -10,12 +10,12 @@ services:
       - DB_HOST=${POST_SVC_DB_HOST}
       - DB_PORT=${POST_SVC_DB_PORT}
     tty: true
-    build: ./post-service
+    build: ./post_service
     ports:
       - "${POST_SVC_PORT}:${POST_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./post-service:/app
+      - ./post_service:/app
     depends_on:
       - post_db
     networks:
@@ -44,12 +44,12 @@ services:
       - DB_USER=${FOLLOWER_DB_USER}
       - DB_PASSWORD=${FOLLOWER_DB_PASSWORD}
     tty: true
-    build: ./follower-service
+    build: ./follower_service
     ports:
       - "${FOLLOWER_SVC_PORT}:${FOLLOWER_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./follower-service:/app
+      - ./follower_service:/app
     depends_on:
       - follower_db
     networks:
@@ -65,7 +65,7 @@ services:
       - "7474:7474"
       - "7687:7687"
     volumes:
-      - ./follower_db:/data
+      - ./follower_service/follower_db:/data
     networks:
       - social_network
 
