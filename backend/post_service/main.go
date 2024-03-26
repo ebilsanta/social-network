@@ -6,11 +6,10 @@ import (
 )
 
 func main() {
-	store, err := NewGraphStore()
+	store, err := NewPostgresStore()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer store.driver.Close(store.ctx)
 
 	if err := store.Init(); err != nil {
 		log.Fatal(err)
