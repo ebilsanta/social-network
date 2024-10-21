@@ -79,7 +79,7 @@ func (s *PostgresStore) CreatePost(post *pb.Post) (*pb.Post, error) {
 	).Scan(&post.Id)
 
 	if err != nil {
-		return nil, err
+		return nil, NewPostgresError(statement, err)
 	}
 
 	return post, nil
@@ -90,7 +90,7 @@ func (s *PostgresStore) GetPosts() ([]*pb.Post, error) {
 	rows, err := s.db.Query(statement)
 
 	if err != nil {
-		return nil, err
+		return nil, NewPostgresError(statement, err)
 	}
 	posts := []*pb.Post{}
 	for rows.Next() {
@@ -107,19 +107,19 @@ func (s *PostgresStore) GetPostByID(id int64) (*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
-		return nil, err
+		return nil, NewPostgresError(statement, err)
 	}
 	for rows.Next() {
 		return scanIntoPost(rows)
 	}
-	return nil, fmt.Errorf("post %d not found", id)
+	return nil, NewPostNotFoundError(id)
 }
 
 func (s *PostgresStore) GetPostsByUserID(id int64) ([]*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
-		return nil, err
+		return nil, NewPostgresError(statement, err)
 	}
 	posts := []*pb.Post{}
 	for rows.Next() {
