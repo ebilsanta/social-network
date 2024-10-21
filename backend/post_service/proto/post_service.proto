@@ -3,7 +3,6 @@ syntax = "proto3";
 option go_package = "github.com/ebilsanta/social-network/backend/post_service/proto";
 
 import "google/protobuf/timestamp.proto";
-import "validate/validate.proto";
 
 service PostService {
   rpc CreatePost (CreatePostRequest) returns (Post) {}
@@ -14,7 +13,7 @@ service PostService {
 
 message CreatePostRequest {
   string caption = 1 [(validate.rules).string = {min_len: 1, max_len: 2000}];
-  string imageURL = 2 [(validate.rules).string = {min_len: 1, max_len: 2000}];;
+  string imageURL = 2 [(validate.rules).string = {min_len: 1, max_len: 2000}];
   int64 userId = 3 [(validate.rules).int64 = {min: 0}];
 }
 

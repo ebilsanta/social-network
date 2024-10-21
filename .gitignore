@@ -6,4 +6,4 @@ bin/
 # for local dev
 backend/post_service/post_svc_data
 
-backend/follower_db/
+backend/follower_service/follower_db/

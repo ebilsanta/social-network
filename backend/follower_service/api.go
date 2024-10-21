@@ -93,7 +93,7 @@ func (s *APIServer) handleFollow(w http.ResponseWriter, r *http.Request) error {
 	if err := s.store.AddFollower(followerID, followedUserID); err != nil {
 		return err
 	}
-	return WriteJSON(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("User %s has followed user %s", followerID, followedUserID)})
+	return WriteJSON(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("User %d has followed user %d", followerID, followedUserID)})
 }
 
 func (s *APIServer) handleUnfollow(w http.ResponseWriter, r *http.Request) error {
@@ -105,7 +105,7 @@ func (s *APIServer) handleUnfollow(w http.ResponseWriter, r *http.Request) error
 	if err := s.store.DeleteFollower(followerID, followedUserID); err != nil {
 		return err
 	}
-	return WriteJSON(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("User %s has unfollowed user %s", followerID, followedUserID)})
+	return WriteJSON(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("User %d has unfollowed user %d", followerID, followedUserID)})
 }
 
 func getID(r *http.Request) (int, error) {
