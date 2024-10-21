@@ -12,22 +12,22 @@ service PostService {
 }
 
 message CreatePostRequest {
-  string caption = 1 [(validate.rules).string = {min_len: 1, max_len: 2000}];
-  string imageURL = 2 [(validate.rules).string = {min_len: 1, max_len: 2000}];
-  int64 userId = 3 [(validate.rules).int64 = {min: 0}];
+  string caption = 1;
+  string imageURL = 2;
+  int64 userId = 3;
 }
 
 message Post {
-  int64 id = 1 [(validate.rules).int64 = {min: 0}];
-  string caption = 2 [(validate.rules).string = {min_len: 1, max_len: 2000}];
-  string imageURL = 3 [(validate.rules).string = {min_len: 1, max_len: 2000}];
-  int64 userID = 4 [(validate.rules).int64 = {min: 0}];
+  int64 id = 1;
+  string caption = 2;
+  string imageURL = 3;
+  int64 userID = 4;
   google.protobuf.Timestamp createdAt = 5;
   google.protobuf.Timestamp deletedAt = 6;
 }
 
 message GetPostRequest {
-  int64 id = 1 [(validate.rules).int64 = {min: 0}];
+  int64 id = 1;
 }
 
 message GetPostsRequest {}
@@ -37,5 +37,5 @@ message GetPostsResponse {
 }
 
 message GetPostByUserRequest {
-  int64 id = 1 [(validate.rules).int64 = {min: 0}];
+  int64 id = 1;
 }

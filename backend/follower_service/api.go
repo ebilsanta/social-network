@@ -1,132 +1,68 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
-	"strconv"
+	"context"
+	"errors"
 
-	"github.com/gorilla/mux"
+	pb "github.com/ebilsanta/social-network/backend/follower-service/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func WriteJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(v)
+type FollowerServiceServer struct {
+	pb.UnimplementedFollowerServiceServer
+	store Storage
 }
 
-type apiFunc func(http.ResponseWriter, *http.Request) error
-
-type APIError struct {
-	Error string `json:"error"`
-}
-
-func makeHTTPHandlerFunc(f apiFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := f(w, r); err != nil {
-			WriteJSON(w, http.StatusBadRequest, APIError{Error: err.Error()})
-		}
+func newServer(store Storage) *FollowerServiceServer {
+	return &FollowerServiceServer{
+		store: store,
 	}
 }
 
-type APIServer struct {
-	listenAddr string
-	store      Storage
-}
-
-func NewAPIServer(listenAddr string, store Storage) *APIServer {
-	return &APIServer{
-		listenAddr: listenAddr,
-		store:      store,
-	}
-}
-
-func (s *APIServer) Run() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/users/{id}/followers", makeHTTPHandlerFunc(s.handleGetFollowers))
-
-	router.HandleFunc("/users/{id}/following", makeHTTPHandlerFunc(s.handleGetFollowing))
-
-	router.HandleFunc("/users/{followerID}/follow/{followedUserID}", makeHTTPHandlerFunc(s.handleFollow))
-
-	router.HandleFunc("/users/{followerID}/unfollow/{followedUserID}", makeHTTPHandlerFunc(s.handleUnfollow))
-
-	log.Println("Follower service running on port:", s.listenAddr)
-
-	http.ListenAndServe(s.listenAddr, router)
-}
-
-func (s *APIServer) handleGetFollowers(w http.ResponseWriter, r *http.Request) error {
-	id, err := getID(r)
+func (s *FollowerServiceServer) GetFollowers(ctx context.Context, req *pb.GetFollowersRequest) (*pb.GetFollowersResponse, error) {
+	followers, err := s.store.GetFollowers(req.Id)
 	if err != nil {
-		return err
+		return nil, HandleError(err)
 	}
-
-	followers, err := s.store.GetFollowers(id)
-	if err != nil {
-		return err
-	}
-	return WriteJSON(w, http.StatusOK, followers)
+	return &pb.GetFollowersResponse{Followers: followers}, nil
 }
 
-func (s *APIServer) handleGetFollowing(w http.ResponseWriter, r *http.Request) error {
-	id, err := getID(r)
+func (s *FollowerServiceServer) GetFollowing(ctx context.Context, req *pb.GetFollowingRequest) (*pb.GetFollowingResponse, error) {
+	following, err := s.store.GetFollowing(req.Id)
 	if err != nil {
-		return err
+		return nil, HandleError(err)
 	}
-
-	following, err := s.store.GetFollowing(id)
-	if err != nil {
-		return err
-	}
-	return WriteJSON(w, http.StatusOK, following)
+	return &pb.GetFollowingResponse{Following: following}, nil
 }
 
-func (s *APIServer) handleFollow(w http.ResponseWriter, r *http.Request) error {
-	followerID, followedUserID, err := getFollowerAndFollowedID(r)
+func (s *FollowerServiceServer) AddFollower(ctx context.Context, req *pb.AddFollowerRequest) (*emptypb.Empty, error) {
+	err := s.store.AddFollower(req.FollowerID, req.FollowedID)
 	if err != nil {
-		return err
+		return nil, HandleError(err)
 	}
-
-	if err := s.store.AddFollower(followerID, followedUserID); err != nil {
-		return err
-	}
-	return WriteJSON(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("User %d has followed user %d", followerID, followedUserID)})
+	return nil, nil
 }
 
-func (s *APIServer) handleUnfollow(w http.ResponseWriter, r *http.Request) error {
-	followerID, followedUserID, err := getFollowerAndFollowedID(r)
+func (s *FollowerServiceServer) DeleteFollower(ctx context.Context, req *pb.DeleteFollowerRequest) (*emptypb.Empty, error) {
+	err := s.store.DeleteFollower(req.FollowerID, req.FollowedID)
 	if err != nil {
-		return err
+		return nil, HandleError(err)
 	}
-
-	if err := s.store.DeleteFollower(followerID, followedUserID); err != nil {
-		return err
-	}
-	return WriteJSON(w, http.StatusOK, map[string]string{"message": fmt.Sprintf("User %d has unfollowed user %d", followerID, followedUserID)})
+	return nil, nil
 }
 
-func getID(r *http.Request) (int, error) {
-	idStr := mux.Vars(r)["id"]
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return id, fmt.Errorf("invalid id %s", idStr)
+func HandleError(err error) error {
+	var notFoundErr *UserNotFoundError
+	if errors.As(err, &notFoundErr) {
+		return status.Errorf(codes.NotFound, "user with id %d not found", notFoundErr.UserID)
 	}
-	return id, nil
-}
 
-func getFollowerAndFollowedID(r *http.Request) (int, int, error) {
-	followerIDStr := mux.Vars(r)["followerID"]
-	followerID, err := strconv.Atoi(followerIDStr)
-	if err != nil {
-		return 0, 0, fmt.Errorf("invalid followerID %s", followerIDStr)
+	var neo4jErr *Neo4jError
+	if errors.As(err, &neo4jErr) {
+		return status.Errorf(codes.Internal, "neo4j database error: %v", neo4jErr)
 	}
-	followedUserIDStr := mux.Vars(r)["followedUserID"]
-	followedUserID, err := strconv.Atoi(followedUserIDStr)
-	if err != nil {
-		return 0, 0, fmt.Errorf("invalid followerID %s", followedUserIDStr)
-	}
-	return followerID, followedUserID, nil
+
+	return status.Errorf(codes.Unknown, "an unexpected error occurred: %v", err)
 }
