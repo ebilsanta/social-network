@@ -4,17 +4,19 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
 	_ "github.com/lib/pq"
 )
 
 type Storage interface {
-	CreatePost(*Post) (*Post, error)
-	DeletePost(int) error
-	UpdatePost(*Post) error
-	GetPosts() ([]*Post, error)
-	GetPostByID(int) (*Post, error)
-	GetPostsByUserID(int) ([]*Post, error)
+	CreatePost(*pb.Post) (*pb.Post, error)
+	GetPosts() ([]*pb.Post, error)
+	GetPostByID(int64) (*pb.Post, error)
+	GetPostsByUserID(int64) ([]*pb.Post, error)
 }
 
 type PostgresStore struct {
@@ -53,7 +55,7 @@ func (s *PostgresStore) CreatePostTable() error {
 		id serial primary key,
 		caption varchar(2000),
 		image_url varchar(2000),
-		user_id serial,
+		user_id string,
 		created_at timestamp,
 		deleted_at timestamp
 	)`
@@ -61,7 +63,7 @@ func (s *PostgresStore) CreatePostTable() error {
 	return err
 }
 
-func (s *PostgresStore) CreatePost(post *Post) (*Post, error) {
+func (s *PostgresStore) CreatePost(post *pb.Post) (*pb.Post, error) {
 	statement := `
 		INSERT INTO post (caption, image_url, user_id, created_at)
 		VALUES ($1, $2, $3, $4)
@@ -73,8 +75,8 @@ func (s *PostgresStore) CreatePost(post *Post) (*Post, error) {
 		post.Caption,
 		post.ImageURL,
 		post.UserID,
-		post.CreatedAt,
-	).Scan(&post.ID)
+		post.CreatedAt.AsTime(),
+	).Scan(&post.Id)
 
 	if err != nil {
 		return nil, err
@@ -83,24 +85,14 @@ func (s *PostgresStore) CreatePost(post *Post) (*Post, error) {
 	return post, nil
 }
 
-func (s *PostgresStore) UpdatePost(post *Post) error {
-	return nil
-}
-
-func (s *PostgresStore) DeletePost(id int) error {
-	statement := "UPDATE post SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1"
-	_, err := s.db.Query(statement, id)
-	return err
-}
-
-func (s *PostgresStore) GetPosts() ([]*Post, error) {
+func (s *PostgresStore) GetPosts() ([]*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE deleted_at IS NULL"
 	rows, err := s.db.Query(statement)
 
 	if err != nil {
 		return nil, err
 	}
-	posts := []*Post{}
+	posts := []*pb.Post{}
 	for rows.Next() {
 		post, err := scanIntoPost(rows)
 		if err != nil {
@@ -111,7 +103,7 @@ func (s *PostgresStore) GetPosts() ([]*Post, error) {
 	return posts, nil
 }
 
-func (s *PostgresStore) GetPostByID(id int) (*Post, error) {
+func (s *PostgresStore) GetPostByID(id int64) (*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
@@ -123,13 +115,13 @@ func (s *PostgresStore) GetPostByID(id int) (*Post, error) {
 	return nil, fmt.Errorf("post %d not found", id)
 }
 
-func (s *PostgresStore) GetPostsByUserID(id int) ([]*Post, error) {
+func (s *PostgresStore) GetPostsByUserID(id int64) ([]*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
 		return nil, err
 	}
-	posts := []*Post{}
+	posts := []*pb.Post{}
 	for rows.Next() {
 		post, err := scanIntoPost(rows)
 		if err != nil {
@@ -140,18 +132,29 @@ func (s *PostgresStore) GetPostsByUserID(id int) ([]*Post, error) {
 	return posts, nil
 }
 
-func scanIntoPost(rows *sql.Rows) (*Post, error) {
-	post := Post{}
+func scanIntoPost(rows *sql.Rows) (*pb.Post, error) {
+	var createdAt time.Time
+	var deletedAt sql.NullTime
+
+	post := pb.Post{}
 	err := rows.Scan(
-		&post.ID,
+		&post.Id,
 		&post.Caption,
 		&post.ImageURL,
 		&post.UserID,
-		&post.CreatedAt,
-		&post.DeletedAt,
+		&createdAt,
+		&deletedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	post.CreatedAt = timestamppb.New(createdAt)
+	if deletedAt.Valid {
+		post.DeletedAt = timestamppb.New(deletedAt.Time)
+	} else {
+		post.DeletedAt = nil
+	}
+
 	return &post, nil
 }

@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = "github.com/ebilsanta/social-network/backend/post_service/proto";
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+service PostService {
+  rpc CreatePost (CreatePostRequest) returns (Post) {}
+  rpc GetPost (GetPostRequest) returns (Post) {}
+  rpc GetPosts (GetPostsRequest) returns (GetPostsResponse) {}
+  rpc GetPostByUserID (GetPostByUserRequest) returns (GetPostsResponse) {}
+}
+
+message CreatePostRequest {
+  string caption = 1 [(validate.rules).string = {min_len: 1, max_len: 2000}];
+  string imageURL = 2 [(validate.rules).string = {min_len: 1, max_len: 2000}];;
+  int64 userId = 3 [(validate.rules).int64 = {min: 0}];
+}
+
+message Post {
+  int64 id = 1 [(validate.rules).int64 = {min: 0}];
+  string caption = 2 [(validate.rules).string = {min_len: 1, max_len: 2000}];
+  string imageURL = 3 [(validate.rules).string = {min_len: 1, max_len: 2000}];
+  int64 userID = 4 [(validate.rules).int64 = {min: 0}];
+  google.protobuf.Timestamp createdAt = 5;
+  google.protobuf.Timestamp deletedAt = 6;
+}
+
+message GetPostRequest {
+  int64 id = 1 [(validate.rules).int64 = {min: 0}];
+}
+
+message GetPostsRequest {}
+
+message GetPostsResponse {
+  repeated Post posts = 1;
+}
+
+message GetPostByUserRequest {
+  int64 id = 1 [(validate.rules).int64 = {min: 0}];
+}

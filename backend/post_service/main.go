@@ -1,8 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net"
 	"os"
+
+	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -15,6 +20,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := NewAPIServer(":"+os.Getenv("SERVER_PORT"), store)
-	server.Run()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	log.Default().Println("Post service running on port:", os.Getenv("SERVER_PORT"))
+	grpcServer := grpc.NewServer()
+	pb.RegisterPostServiceServer(grpcServer, newServer(store))
+	grpcServer.Serve(lis)
 }
