@@ -15,8 +15,8 @@ import (
 type Storage interface {
 	CreatePost(*pb.Post) (*pb.Post, error)
 	GetPosts() ([]*pb.Post, error)
-	GetPostByID(int64) (*pb.Post, error)
-	GetPostsByUserID(int64) ([]*pb.Post, error)
+	GetPostById(int64) (*pb.Post, error)
+	GetPostsByUserId(string) ([]*pb.Post, error)
 }
 
 type PostgresStore struct {
@@ -74,7 +74,7 @@ func (s *PostgresStore) CreatePost(post *pb.Post) (*pb.Post, error) {
 		statement,
 		post.Caption,
 		post.ImageURL,
-		post.UserID,
+		post.UserId,
 		post.CreatedAt.AsTime(),
 	).Scan(&post.Id)
 
@@ -103,7 +103,7 @@ func (s *PostgresStore) GetPosts() ([]*pb.Post, error) {
 	return posts, nil
 }
 
-func (s *PostgresStore) GetPostByID(id int64) (*pb.Post, error) {
+func (s *PostgresStore) GetPostById(id int64) (*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
@@ -115,7 +115,7 @@ func (s *PostgresStore) GetPostByID(id int64) (*pb.Post, error) {
 	return nil, NewPostNotFoundError(id)
 }
 
-func (s *PostgresStore) GetPostsByUserID(id int64) ([]*pb.Post, error) {
+func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
@@ -141,7 +141,7 @@ func scanIntoPost(rows *sql.Rows) (*pb.Post, error) {
 		&post.Id,
 		&post.Caption,
 		&post.ImageURL,
-		&post.UserID,
+		&post.UserId,
 		&createdAt,
 		&deletedAt,
 	)

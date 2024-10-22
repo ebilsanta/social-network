@@ -5,5 +5,5 @@ bin/
 
 # for local dev
 backend/post_service/post_svc_data
-
 backend/follower_service/follower_db/
+backend/user_service/user_db/

@@ -32,7 +32,7 @@ func (s *PostServiceServer) CreatePost(ctx context.Context, req *pb.CreatePostRe
 }
 
 func (s *PostServiceServer) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.Post, error) {
-	post, err := s.store.GetPostByID(req.Id)
+	post, err := s.store.GetPostById(req.Id)
 	if err != nil {
 		return nil, HandleError(err)
 	}
@@ -47,8 +47,8 @@ func (s *PostServiceServer) GetPosts(ctx context.Context, req *pb.GetPostsReques
 	return &pb.GetPostsResponse{Posts: posts}, nil
 }
 
-func (s *PostServiceServer) GetPostByUserID(ctx context.Context, req *pb.GetPostByUserRequest) (*pb.GetPostsResponse, error) {
-	posts, err := s.store.GetPostsByUserID(req.Id)
+func (s *PostServiceServer) GetPostByUserId(ctx context.Context, req *pb.GetPostByUserRequest) (*pb.GetPostsResponse, error) {
+	posts, err := s.store.GetPostsByUserId(req.Id)
 	if err != nil {
 		return nil, HandleError(err)
 	}
