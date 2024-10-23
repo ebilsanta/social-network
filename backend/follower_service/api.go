@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 
 	pb "github.com/ebilsanta/social-network/backend/follower-service/proto"
 	"google.golang.org/grpc/codes"
@@ -22,6 +23,7 @@ func newServer(store Storage) *FollowerServiceServer {
 }
 
 func (s *FollowerServiceServer) GetFollowers(ctx context.Context, req *pb.GetFollowersRequest) (*pb.GetFollowersResponse, error) {
+	log.Default().Printf("follower_service GetFollowers request: %v", req)
 	followers, err := s.store.GetFollowers(req.Id)
 	if err != nil {
 		return nil, HandleError(err)
@@ -30,6 +32,7 @@ func (s *FollowerServiceServer) GetFollowers(ctx context.Context, req *pb.GetFol
 }
 
 func (s *FollowerServiceServer) GetFollowing(ctx context.Context, req *pb.GetFollowingRequest) (*pb.GetFollowingResponse, error) {
+	log.Default().Printf("follower_service GetFollowing request: %v", req)
 	following, err := s.store.GetFollowing(req.Id)
 	if err != nil {
 		return nil, HandleError(err)
@@ -38,6 +41,7 @@ func (s *FollowerServiceServer) GetFollowing(ctx context.Context, req *pb.GetFol
 }
 
 func (s *FollowerServiceServer) AddFollower(ctx context.Context, req *pb.AddFollowerRequest) (*emptypb.Empty, error) {
+	log.Default().Printf("follower_service AddFollower request: %v", req)
 	err := s.store.AddFollower(req.FollowerID, req.FollowedID)
 	if err != nil {
 		return nil, HandleError(err)
@@ -46,6 +50,7 @@ func (s *FollowerServiceServer) AddFollower(ctx context.Context, req *pb.AddFoll
 }
 
 func (s *FollowerServiceServer) DeleteFollower(ctx context.Context, req *pb.DeleteFollowerRequest) (*emptypb.Empty, error) {
+	log.Default().Printf("follower_service DeleteFollower request: %v", req)
 	err := s.store.DeleteFollower(req.FollowerID, req.FollowedID)
 	if err != nil {
 		return nil, HandleError(err)

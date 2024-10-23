@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"strconv"
 
 	pb "github.com/ebilsanta/social-network/backend/feed-service/api/proto/generated"
@@ -25,6 +25,7 @@ func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, p
 }
 
 func (s *FeedServiceServer) GetFeed(ctx context.Context, req *pb.GetFeedRequest) (*pb.GetFeedResponse, error) {
+	log.Default().Printf("feed_service GetFeed request: %v", req)
 	feed, err := s.store.GetFeed(req.UserId, req.Offset, req.Limit)
 
 	if err != nil {
@@ -60,7 +61,7 @@ func (s *FeedServiceServer) createFeed(ctx context.Context, req *pb.GetFeedReque
 	for i, user := range following.Following {
 		userIds[i] = user.Id
 	}
-	fmt.Printf("get feed from userIds: %v\n", userIds)
+
 	posts, err := s.postClient.GetPostsByUserIds(ctx, &pb.GetPostsByUsersRequest{UserIds: userIds})
 
 	if err != nil {

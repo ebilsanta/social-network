@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"database/sql"
@@ -9,6 +9,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/ebilsanta/social-network/backend/post-service/errtypes"
 	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
 	_ "github.com/lib/pq"
 )
@@ -82,7 +83,7 @@ func (s *PostgresStore) CreatePost(post *pb.Post) (*pb.Post, error) {
 	).Scan(&post.Id)
 
 	if err != nil {
-		return nil, NewPostgresError(statement, err)
+		return nil, errtypes.NewPostgresError(statement, err)
 	}
 
 	return post, nil
@@ -93,7 +94,7 @@ func (s *PostgresStore) GetPosts() ([]*pb.Post, error) {
 	rows, err := s.db.Query(statement)
 
 	if err != nil {
-		return nil, NewPostgresError(statement, err)
+		return nil, errtypes.NewPostgresError(statement, err)
 	}
 	posts := []*pb.Post{}
 	for rows.Next() {
@@ -110,12 +111,12 @@ func (s *PostgresStore) GetPostById(id int64) (*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
-		return nil, NewPostgresError(statement, err)
+		return nil, errtypes.NewPostgresError(statement, err)
 	}
 	for rows.Next() {
 		return scanIntoPost(rows)
 	}
-	return nil, NewPostNotFoundError(id)
+	return nil, errtypes.NewPostNotFoundError(id)
 }
 
 func (s *PostgresStore) GetPostsByPostIds(postIds []int64) ([]*pb.Post, error) {
@@ -136,17 +137,14 @@ func (s *PostgresStore) GetPostsByPostIds(postIds []int64) ([]*pb.Post, error) {
 		AND deleted_at IS NULL
 		ORDER BY created_at DESC`, placeholdersList)
 
-	fmt.Printf("statement: %s\n", statement)
-
 	params := make([]interface{}, len(postIds))
 	for i, id := range postIds {
 		params[i] = id
 	}
-	fmt.Printf("params: %v\n", params)
 
 	rows, err := s.db.Query(statement, params...)
 	if err != nil {
-		return nil, NewPostgresError(statement, err)
+		return nil, errtypes.NewPostgresError(statement, err)
 	}
 	defer rows.Close()
 
@@ -170,7 +168,7 @@ func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
 	if err != nil {
-		return nil, NewPostgresError(statement, err)
+		return nil, errtypes.NewPostgresError(statement, err)
 	}
 	posts := []*pb.Post{}
 	for rows.Next() {
@@ -200,22 +198,19 @@ func (s *PostgresStore) GetPostsByUserIds(userIds []string) ([]*pb.Post, error) 
 		WHERE user_id IN (%s) AND deleted_at IS NULL 
 		ORDER BY created_at DESC 
 		LIMIT 10`, placeholdersList)
-	fmt.Printf("statement: %s\n", statement)
 	params := make([]interface{}, len(userIds))
 	for i, id := range userIds {
 		params[i] = id
 	}
-	fmt.Printf("params: %v\n", params)
 
 	rows, err := s.db.Query(statement, params...)
 	if err != nil {
-		return nil, NewPostgresError(statement, err)
+		return nil, errtypes.NewPostgresError(statement, err)
 	}
 	defer rows.Close()
 
 	posts := []*pb.Post{}
 	for rows.Next() {
-		fmt.Printf("rows: %v\n", rows)
 		post, err := scanIntoPost(rows)
 		if err != nil {
 			return nil, err

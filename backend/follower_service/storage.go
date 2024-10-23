@@ -73,7 +73,6 @@ func (s *GraphStore) Init() error {
 }
 
 func (s *GraphStore) GetFollowers(userID string) ([]*pb.User, error) {
-	fmt.Printf("Getting followers for user %s\n", userID)
 	exists, err := s.UserExists(userID)
 	if err != nil {
 		return nil, NewNeo4jError("checking if user exists", err)
