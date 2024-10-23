@@ -45,7 +45,7 @@ func (s *FeedServiceServer) GetFeed(ctx context.Context, req *pb.GetFeedRequest)
 		if err != nil {
 			return nil, err
 		}
-		return &pb.GetFeedResponse{Posts: posts.Posts}, nil
+		return &pb.GetFeedResponse{Posts: posts.Posts, FromCache: true}, nil
 	}
 
 	return s.createFeed(ctx, req)
@@ -62,10 +62,10 @@ func (s *FeedServiceServer) createFeed(ctx context.Context, req *pb.GetFeedReque
 		userIds[i] = user.Id
 	}
 
-	posts, err := s.postClient.GetPostsByUserIds(ctx, &pb.GetPostsByUsersRequest{UserIds: userIds})
+	posts, err := s.postClient.GetPostsByUserIds(ctx, &pb.GetPostsByUsersRequest{UserIds: userIds, Offset: req.Offset, Limit: req.Limit})
 
 	if err != nil {
 		return nil, err
 	}
-	return &pb.GetFeedResponse{Posts: posts.Posts}, nil
+	return &pb.GetFeedResponse{Posts: posts.Posts, FromCache: false}, nil
 }

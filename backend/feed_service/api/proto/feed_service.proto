@@ -16,4 +16,5 @@ message GetFeedRequest {
 
 message GetFeedResponse {
   repeated Post posts = 1;
+  bool fromCache = 2;
 }

@@ -20,7 +20,7 @@ type Storage interface {
 	GetPostById(int64) (*pb.Post, error)
 	GetPostsByPostIds([]int64) ([]*pb.Post, error)
 	GetPostsByUserId(string) ([]*pb.Post, error)
-	GetPostsByUserIds([]string) ([]*pb.Post, error)
+	GetPostsByUserIds([]string, int32, int32) ([]*pb.Post, error)
 }
 
 type PostgresStore struct {
@@ -181,7 +181,7 @@ func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
 	return posts, nil
 }
 
-func (s *PostgresStore) GetPostsByUserIds(userIds []string) ([]*pb.Post, error) {
+func (s *PostgresStore) GetPostsByUserIds(userIds []string, offset, limit int32) ([]*pb.Post, error) {
 	if len(userIds) == 0 {
 		return []*pb.Post{}, nil
 	}
@@ -197,11 +197,14 @@ func (s *PostgresStore) GetPostsByUserIds(userIds []string) ([]*pb.Post, error) 
 		SELECT * FROM post 
 		WHERE user_id IN (%s) AND deleted_at IS NULL 
 		ORDER BY created_at DESC 
-		LIMIT 10`, placeholdersList)
-	params := make([]interface{}, len(userIds))
+		LIMIT $%d OFFSET $%d`, placeholdersList, len(userIds)+1, len(userIds)+2)
+	fmt.Printf("statement: %s\n", statement)
+	params := make([]interface{}, len(userIds)+2)
 	for i, id := range userIds {
 		params[i] = id
 	}
+	params[len(userIds)] = limit
+	params[len(userIds)+1] = offset
 
 	rows, err := s.db.Query(statement, params...)
 	if err != nil {

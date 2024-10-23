@@ -82,7 +82,7 @@ func (s *PostServiceServer) GetPostsByUserId(ctx context.Context, req *pb.GetPos
 
 func (s *PostServiceServer) GetPostsByUserIds(ctx context.Context, req *pb.GetPostsByUsersRequest) (*pb.GetPostsResponse, error) {
 	log.Default().Printf("post_service GetPostsByUserIds request: %v", req)
-	posts, err := s.store.GetPostsByUserIds(req.UserIds)
+	posts, err := s.store.GetPostsByUserIds(req.UserIds, req.Offset, req.Limit)
 	if err != nil {
 		return nil, HandleError(err)
 	}
