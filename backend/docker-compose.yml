@@ -101,10 +101,43 @@ services:
     networks:
       - social_network
 
+  feed_service:
+    container_name: feed_service
+    environment:
+      - SERVER_PORT=${FEED_SVC_PORT}
+      - REDIS_URL=redis://${FEED_DB_USER}:${FEED_DB_PASSWORD}@feed_db
+      - FOLLOWER_SVC_PORT=${FOLLOWER_SVC_PORT}
+      - POST_SVC_PORT=${POST_SVC_PORT}
+    tty: true
+    build: ./feed_service
+    ports:
+      - "${FEED_SVC_PORT}:${FEED_SVC_PORT}"
+    restart: on-failure
+    volumes:
+      - ./feed_service:/app
+    depends_on:
+      - feed_db
+    networks:
+      - social_network
+  
+  feed_db:
+    container_name: feed_db
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${FEED_DB_PASSWORD}
+    volumes: 
+      - ./feed_service/feed_db:/data
+    networks:
+      - social_network
+
 volumes:
   post_svc_data:
   follower_db:
   user_db:
+  feed_db:
+    driver: local
 
 networks:
   social_network:

@@ -56,7 +56,7 @@ func (s *FollowerServiceServer) DeleteFollower(ctx context.Context, req *pb.Dele
 func HandleError(err error) error {
 	var notFoundErr *UserNotFoundError
 	if errors.As(err, &notFoundErr) {
-		return status.Errorf(codes.NotFound, "user with id %d not found", notFoundErr.UserID)
+		return status.Errorf(codes.NotFound, "user with id %s not found", notFoundErr.UserID)
 	}
 
 	var neo4jErr *Neo4jError

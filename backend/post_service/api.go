@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
 	"google.golang.org/grpc/codes"
@@ -47,8 +48,25 @@ func (s *PostServiceServer) GetPosts(ctx context.Context, req *pb.GetPostsReques
 	return &pb.GetPostsResponse{Posts: posts}, nil
 }
 
-func (s *PostServiceServer) GetPostByUserId(ctx context.Context, req *pb.GetPostByUserRequest) (*pb.GetPostsResponse, error) {
+func (s *PostServiceServer) GetPostsByPostIds(ctx context.Context, req *pb.GetPostsByIdsRequest) (*pb.GetPostsResponse, error) {
+	posts, err := s.store.GetPostsByPostIds(req.PostIds)
+	if err != nil {
+		return nil, HandleError(err)
+	}
+	return &pb.GetPostsResponse{Posts: posts}, nil
+}
+
+func (s *PostServiceServer) GetPostsByUserId(ctx context.Context, req *pb.GetPostsByUserRequest) (*pb.GetPostsResponse, error) {
 	posts, err := s.store.GetPostsByUserId(req.Id)
+	if err != nil {
+		return nil, HandleError(err)
+	}
+	return &pb.GetPostsResponse{Posts: posts}, nil
+}
+
+func (s *PostServiceServer) GetPostsByUserIds(ctx context.Context, req *pb.GetPostsByUsersRequest) (*pb.GetPostsResponse, error) {
+	fmt.Printf("post svc: get posts by user ids: %v\n", req.UserIds)
+	posts, err := s.store.GetPostsByUserIds(req.UserIds)
 	if err != nil {
 		return nil, HandleError(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,7 +17,9 @@ type Storage interface {
 	CreatePost(*pb.Post) (*pb.Post, error)
 	GetPosts() ([]*pb.Post, error)
 	GetPostById(int64) (*pb.Post, error)
+	GetPostsByPostIds([]int64) ([]*pb.Post, error)
 	GetPostsByUserId(string) ([]*pb.Post, error)
+	GetPostsByUserIds([]string) ([]*pb.Post, error)
 }
 
 type PostgresStore struct {
@@ -115,6 +118,54 @@ func (s *PostgresStore) GetPostById(id int64) (*pb.Post, error) {
 	return nil, NewPostNotFoundError(id)
 }
 
+func (s *PostgresStore) GetPostsByPostIds(postIds []int64) ([]*pb.Post, error) {
+	if len(postIds) == 0 {
+		return []*pb.Post{}, nil
+	}
+
+	placeholders := make([]string, len(postIds))
+	for i := range postIds {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+	}
+
+	placeholdersList := strings.Join(placeholders, ",")
+
+	statement := fmt.Sprintf(`
+		SELECT * FROM post
+		WHERE id IN (%s) 
+		AND deleted_at IS NULL
+		ORDER BY created_at DESC`, placeholdersList)
+
+	fmt.Printf("statement: %s\n", statement)
+
+	params := make([]interface{}, len(postIds))
+	for i, id := range postIds {
+		params[i] = id
+	}
+	fmt.Printf("params: %v\n", params)
+
+	rows, err := s.db.Query(statement, params...)
+	if err != nil {
+		return nil, NewPostgresError(statement, err)
+	}
+	defer rows.Close()
+
+	posts := []*pb.Post{}
+	for rows.Next() {
+		post, err := scanIntoPost(rows)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
 func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
 	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
 	rows, err := s.db.Query(statement, id)
@@ -129,6 +180,53 @@ func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
 		}
 		posts = append(posts, post)
 	}
+	return posts, nil
+}
+
+func (s *PostgresStore) GetPostsByUserIds(userIds []string) ([]*pb.Post, error) {
+	if len(userIds) == 0 {
+		return []*pb.Post{}, nil
+	}
+
+	placeholders := make([]string, len(userIds))
+	for i := range userIds {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+	}
+
+	placeholdersList := strings.Join(placeholders, ",")
+
+	statement := fmt.Sprintf(`
+		SELECT * FROM post 
+		WHERE user_id IN (%s) AND deleted_at IS NULL 
+		ORDER BY created_at DESC 
+		LIMIT 10`, placeholdersList)
+	fmt.Printf("statement: %s\n", statement)
+	params := make([]interface{}, len(userIds))
+	for i, id := range userIds {
+		params[i] = id
+	}
+	fmt.Printf("params: %v\n", params)
+
+	rows, err := s.db.Query(statement, params...)
+	if err != nil {
+		return nil, NewPostgresError(statement, err)
+	}
+	defer rows.Close()
+
+	posts := []*pb.Post{}
+	for rows.Next() {
+		fmt.Printf("rows: %v\n", rows)
+		post, err := scanIntoPost(rows)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return posts, nil
 }
 

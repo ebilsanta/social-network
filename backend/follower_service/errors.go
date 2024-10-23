@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 type UserNotFoundError struct {
-	UserID int64
+	UserID string
 }
 
 type Neo4jError struct {
@@ -12,10 +12,10 @@ type Neo4jError struct {
 }
 
 func (e *UserNotFoundError) Error() string {
-	return fmt.Sprintf("user with id %d not found", e.UserID)
+	return fmt.Sprintf("user with id %s not found", e.UserID)
 }
 
-func NewUserNotFoundError(userID int64) error {
+func NewUserNotFoundError(userID string) error {
 	return &UserNotFoundError{UserID: userID}
 }
 
