@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"context"
@@ -8,7 +8,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/ebilsanta/social-network/backend/user-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/user-service/proto/generated"
+	"github.com/ebilsanta/social-network/backend/user-service/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,13 +17,14 @@ import (
 )
 
 type Storage interface {
-	CreateUser(*User) (*pb.User, error)
+	CreateUser(*types.User) (*pb.User, error)
 	GetUsers() ([]*pb.User, error)
 	GetUser(string) (*pb.User, error)
+	DeleteUser(string) error
 }
 
 type MongoStore struct {
-	client     *mongo.Client
+	Client     *mongo.Client
 	collection *mongo.Collection
 }
 
@@ -32,7 +34,7 @@ func NewMongoStore() (*MongoStore, error) {
 		return nil, err
 	}
 	collection := client.Database("user").Collection("user")
-	return &MongoStore{client: client, collection: collection}, nil
+	return &MongoStore{Client: client, collection: collection}, nil
 }
 
 func connectToDB() (*mongo.Client, error) {
@@ -52,7 +54,7 @@ func connectToDB() (*mongo.Client, error) {
 	return client, nil
 }
 
-func (s *MongoStore) CreateUser(user *User) (*pb.User, error) {
+func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
 	result, err := s.collection.InsertOne(context.TODO(), user)
 
 	if err != nil {
@@ -78,7 +80,7 @@ func (s *MongoStore) GetUsers() ([]*pb.User, error) {
 
 	var users []*pb.User
 	for cursor.Next(context.Background()) {
-		var user User
+		var user types.User
 		if err = cursor.Decode(&user); err != nil {
 			return nil, err
 		}
@@ -99,7 +101,7 @@ func (s *MongoStore) GetUser(id string) (*pb.User, error) {
 		return nil, err
 	}
 
-	var user User
+	var user types.User
 	if err := s.collection.FindOne(context.TODO(), primitive.M{"_id": objID}).Decode(&user); err != nil {
 		return nil, err
 	}
@@ -107,7 +109,17 @@ func (s *MongoStore) GetUser(id string) (*pb.User, error) {
 	return decodeUser(user), nil
 }
 
-func decodeUser(user User) *pb.User {
+func (s *MongoStore) DeleteUser(id string) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.collection.DeleteOne(context.TODO(), primitive.M{"_id": objID})
+	return err
+}
+
+func decodeUser(user types.User) *pb.User {
 	var deletedAt *timestamppb.Timestamp
 	if user.DeletedAt != nil {
 		deletedAt = timestamppb.New(*user.DeletedAt)

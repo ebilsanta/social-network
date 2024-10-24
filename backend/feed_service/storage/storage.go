@@ -22,8 +22,8 @@ func NewRedisStore() (*RedisStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	addMultiplePostsToFeed(client, "1")
-	addMultiplePostsToFeed(client, "2")
+	// addMultiplePostsToFeed(client, "1")
+	// addMultiplePostsToFeed(client, "2")
 
 	return &RedisStore{Client: client}, nil
 }

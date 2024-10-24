@@ -8,12 +8,11 @@ WORKDIR /app
 # Download Go modules
 COPY go.mod go.sum ./
 RUN go mod download
-
+# 6719b760ab219e96ff30f1ff
+# 6719b77aab219e96ff30f200
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/engine/reference/builder/#copy
-COPY *.go ./
-
-COPY proto ./proto
+COPY . .
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /user-service

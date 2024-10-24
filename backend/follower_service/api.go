@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	pb "github.com/ebilsanta/social-network/backend/follower-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -20,6 +20,15 @@ func newServer(store Storage) *FollowerServiceServer {
 	return &FollowerServiceServer{
 		store: store,
 	}
+}
+
+func (s *FollowerServiceServer) AddUser(ctx context.Context, req *pb.AddUserRequest) (*emptypb.Empty, error) {
+	log.Default().Printf("follower_service AddUser request: %v", req)
+	err := s.store.AddUser(req.Id)
+	if err != nil {
+		return nil, HandleError(err)
+	}
+	return nil, nil
 }
 
 func (s *FollowerServiceServer) GetFollowers(ctx context.Context, req *pb.GetFollowersRequest) (*pb.GetFollowersResponse, error) {

@@ -59,7 +59,7 @@ func (s *PostgresStore) CreatePostTable() error {
 		id serial primary key,
 		caption varchar(2000),
 		image_url varchar(2000),
-		user_id string,
+		user_id varchar(255),
 		created_at timestamp,
 		deleted_at timestamp
 	)`

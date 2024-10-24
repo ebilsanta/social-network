@@ -11,7 +11,7 @@ import (
 )
 
 type Storage interface {
-	AddToFeeds([]*pb.User, string) error
+	AddToFeeds([]*pb.GraphUser, string) error
 }
 
 type RedisStore struct {
@@ -22,28 +22,9 @@ func NewRedisStore() (*RedisStore, error) {
 	client, err := connectToDB()
 	if err != nil {
 		return nil, err
-	}
-	addMultiplePostsToFeed(client, "1")
-	addMultiplePostsToFeed(client, "2")
-
-	return &RedisStore{Client: client}, nil
 }
 
-func addMultiplePostsToFeed(rdb *redis.Client, userID string) error {
-	posts := []string{"1", "2", "3", "4", "5"}
-	ctx := context.Background()
-	key := fmt.Sprintf("feed:%s", userID)
-	pipe := rdb.Pipeline()
-
-	for _, post := range posts {
-		score := float64(time.Now().Unix())
-		pipe.ZAdd(ctx, key, redis.Z{
-			Score:  score,
-			Member: post,
-		})
-	}
-	_, err := pipe.Exec(ctx)
-	return err
+	return &RedisStore{Client: client}, nil
 }
 
 func connectToDB() (*redis.Client, error) {
@@ -54,7 +35,7 @@ func connectToDB() (*redis.Client, error) {
 	return redis.NewClient(opt), nil
 }
 
-func (s *RedisStore) AddToFeeds(users []*pb.User, postID string) error {
+func (s *RedisStore) AddToFeeds(users []*pb.GraphUser, postID string) error {
 	pipe := s.Client.Pipeline()
 	ctx := context.Background()
 

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/ebilsanta/social-network/backend/follower_service/proto";
+option go_package = "github.com/ebilsanta/social-network/backend/user_service/proto";
 
 import "google/protobuf/empty.proto";
 

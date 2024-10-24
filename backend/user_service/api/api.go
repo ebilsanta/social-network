@@ -1,28 +1,40 @@
-package main
+package api
 
 import (
 	"context"
+	"log"
 
-	pb "github.com/ebilsanta/social-network/backend/user-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/user-service/proto/generated"
+	"github.com/ebilsanta/social-network/backend/user-service/storage"
+	"github.com/ebilsanta/social-network/backend/user-service/types"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UserServiceServer struct {
 	pb.UnimplementedUserServiceServer
-	store Storage
+	store          storage.Storage
+	followerClient pb.FollowerServiceClient
 }
 
-func newServer(store Storage) *UserServiceServer {
+func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient) *UserServiceServer {
 	return &UserServiceServer{
-		store: store,
+		store:          store,
+		followerClient: followerClient,
 	}
 }
 
 func (s *UserServiceServer) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	user := NewUser(req.Email, req.Username, req.ImageURL)
+	user := types.NewUser(req.Email, req.Username, req.ImageURL)
+	log.Default().Printf("user_service CreateUser request: %v", user)
 	dbUser, err := s.store.CreateUser(user)
 
 	if err != nil {
+		return nil, err
+	}
+	log.Default().Printf("user_service CreateUser response: %v", dbUser)
+	_, err = s.followerClient.AddUser(ctx, &pb.AddUserRequest{Id: dbUser.Id})
+	if err != nil {
+		s.store.DeleteUser(dbUser.Id)
 		return nil, err
 	}
 

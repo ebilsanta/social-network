@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 
-	pb "github.com/ebilsanta/social-network/backend/follower-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
 	"google.golang.org/grpc"
 )
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: proto/follower_service.proto
+// source: follower_service.proto
 
 package proto
 
@@ -20,6 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	FollowerService_AddUser_FullMethodName        = "/FollowerService/AddUser"
 	FollowerService_GetFollowers_FullMethodName   = "/FollowerService/GetFollowers"
 	FollowerService_GetFollowing_FullMethodName   = "/FollowerService/GetFollowing"
 	FollowerService_AddFollower_FullMethodName    = "/FollowerService/AddFollower"
@@ -30,6 +31,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FollowerServiceClient interface {
+	AddUser(ctx context.Context, in *AddUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetFollowers(ctx context.Context, in *GetFollowersRequest, opts ...grpc.CallOption) (*GetFollowersResponse, error)
 	GetFollowing(ctx context.Context, in *GetFollowingRequest, opts ...grpc.CallOption) (*GetFollowingResponse, error)
 	AddFollower(ctx context.Context, in *AddFollowerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -42,6 +44,16 @@ type followerServiceClient struct {
 
 func NewFollowerServiceClient(cc grpc.ClientConnInterface) FollowerServiceClient {
 	return &followerServiceClient{cc}
+}
+
+func (c *followerServiceClient) AddUser(ctx context.Context, in *AddUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, FollowerService_AddUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *followerServiceClient) GetFollowers(ctx context.Context, in *GetFollowersRequest, opts ...grpc.CallOption) (*GetFollowersResponse, error) {
@@ -88,6 +100,7 @@ func (c *followerServiceClient) DeleteFollower(ctx context.Context, in *DeleteFo
 // All implementations must embed UnimplementedFollowerServiceServer
 // for forward compatibility.
 type FollowerServiceServer interface {
+	AddUser(context.Context, *AddUserRequest) (*emptypb.Empty, error)
 	GetFollowers(context.Context, *GetFollowersRequest) (*GetFollowersResponse, error)
 	GetFollowing(context.Context, *GetFollowingRequest) (*GetFollowingResponse, error)
 	AddFollower(context.Context, *AddFollowerRequest) (*emptypb.Empty, error)
@@ -102,6 +115,9 @@ type FollowerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedFollowerServiceServer struct{}
 
+func (UnimplementedFollowerServiceServer) AddUser(context.Context, *AddUserRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUser not implemented")
+}
 func (UnimplementedFollowerServiceServer) GetFollowers(context.Context, *GetFollowersRequest) (*GetFollowersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFollowers not implemented")
 }
@@ -133,6 +149,24 @@ func RegisterFollowerServiceServer(s grpc.ServiceRegistrar, srv FollowerServiceS
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&FollowerService_ServiceDesc, srv)
+}
+
+func _FollowerService_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FollowerServiceServer).AddUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FollowerService_AddUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FollowerServiceServer).AddUser(ctx, req.(*AddUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _FollowerService_GetFollowers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -215,6 +249,10 @@ var FollowerService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*FollowerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "AddUser",
+			Handler:    _FollowerService_AddUser_Handler,
+		},
+		{
 			MethodName: "GetFollowers",
 			Handler:    _FollowerService_GetFollowers_Handler,
 		},
@@ -232,5 +270,5 @@ var FollowerService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/follower_service.proto",
+	Metadata: "follower_service.proto",
 }

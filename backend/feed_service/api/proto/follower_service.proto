@@ -5,10 +5,15 @@ option go_package = "github.com/ebilsanta/social-network/backend/feed-service/ap
 import "google/protobuf/empty.proto";
 
 service FollowerService {
+  rpc AddUser (AddUserRequest) returns (google.protobuf.Empty) {}
   rpc GetFollowers (GetFollowersRequest) returns (GetFollowersResponse) {}
   rpc GetFollowing (GetFollowingRequest) returns (GetFollowingResponse) {}
   rpc AddFollower (AddFollowerRequest) returns (google.protobuf.Empty) {}
   rpc DeleteFollower (DeleteFollowerRequest) returns (google.protobuf.Empty) {}
+}
+
+message AddUserRequest {
+  string id = 1;
 }
 
 message GetFollowersRequest {
@@ -16,7 +21,7 @@ message GetFollowersRequest {
 }
 
 message GetFollowersResponse {
-  repeated User followers = 1;
+  repeated GraphUser followers = 1;
 }
 
 message GetFollowingRequest {
@@ -24,7 +29,7 @@ message GetFollowingRequest {
 }
 
 message GetFollowingResponse {
-  repeated User following = 1;
+  repeated GraphUser following = 1;
 }
 
 message AddFollowerRequest {
@@ -37,6 +42,6 @@ message DeleteFollowerRequest {
   string followedID = 2;
 }
 
-message User {
+message GraphUser {
   string id = 1;
 }
