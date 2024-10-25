@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostService_CreatePost_FullMethodName        = "/PostService/CreatePost"
-	PostService_GetPost_FullMethodName           = "/PostService/GetPost"
-	PostService_GetPosts_FullMethodName          = "/PostService/GetPosts"
-	PostService_GetPostsByPostIds_FullMethodName = "/PostService/GetPostsByPostIds"
-	PostService_GetPostsByUserId_FullMethodName  = "/PostService/GetPostsByUserId"
-	PostService_GetPostsByUserIds_FullMethodName = "/PostService/GetPostsByUserIds"
+	PostService_CreatePost_FullMethodName        = "/post_service.PostService/CreatePost"
+	PostService_GetPost_FullMethodName           = "/post_service.PostService/GetPost"
+	PostService_GetPosts_FullMethodName          = "/post_service.PostService/GetPosts"
+	PostService_GetPostsByPostIds_FullMethodName = "/post_service.PostService/GetPostsByPostIds"
+	PostService_GetPostsByUserId_FullMethodName  = "/post_service.PostService/GetPostsByUserId"
+	PostService_GetPostsByUserIds_FullMethodName = "/post_service.PostService/GetPostsByUserIds"
 )
 
 // PostServiceClient is the client API for PostService service.
@@ -278,7 +278,7 @@ func _PostService_GetPostsByUserIds_Handler(srv interface{}, ctx context.Context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PostService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "PostService",
+	ServiceName: "post_service.PostService",
 	HandlerType: (*PostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

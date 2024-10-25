@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package user_service;
+
+option go_package = "github.com/ebilsanta/social-network/backend/user_service/proto";
+
+import "protobuf/src/google/protobuf/timestamp.proto";
+import "protobuf/src/google/protobuf/empty.proto";
+
+service UserService {
+  rpc GetUser (GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/v1/users/{id}"
+    };
+  }
+  
+  rpc GetUsers (google.protobuf.Empty) returns (GetUsersResponse) {
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  }
+  
+  rpc CreateUser (CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  }
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string username = 2;
+  string imageURL = 3;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUsersResponse {
+  repeated User users = 1;
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string imageURL = 4;
+  google.protobuf.Timestamp createdAt = 5;
+  google.protobuf.Timestamp deletedAt = 6;
+}

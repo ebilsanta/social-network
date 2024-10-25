@@ -4,10 +4,18 @@ package feed_service;
 
 option go_package = "github.com/ebilsanta/social-network/backend/feed-service/api/proto";
 
+import "google/api/annotations.proto";
 import "post_service.proto";
 
 service FeedService {
-  rpc GetFeed (GetFeedRequest) returns (GetFeedResponse) {}
+  rpc GetFeed (GetFeedRequest) returns (GetFeedResponse) {
+    option (google.api.http) = {
+      get: "/v1/feed/{userId}"
+      additional_bindings {
+        get: "/v1/feed/{userId}?offset={offset}&limit={limit}"
+      }
+    };
+  }
 }
 
 message GetFeedRequest {

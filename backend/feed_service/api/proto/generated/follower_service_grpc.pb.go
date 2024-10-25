@@ -20,11 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FollowerService_AddUser_FullMethodName        = "/FollowerService/AddUser"
-	FollowerService_GetFollowers_FullMethodName   = "/FollowerService/GetFollowers"
-	FollowerService_GetFollowing_FullMethodName   = "/FollowerService/GetFollowing"
-	FollowerService_AddFollower_FullMethodName    = "/FollowerService/AddFollower"
-	FollowerService_DeleteFollower_FullMethodName = "/FollowerService/DeleteFollower"
+	FollowerService_AddUser_FullMethodName        = "/follower_service.FollowerService/AddUser"
+	FollowerService_GetFollowers_FullMethodName   = "/follower_service.FollowerService/GetFollowers"
+	FollowerService_GetFollowing_FullMethodName   = "/follower_service.FollowerService/GetFollowing"
+	FollowerService_AddFollower_FullMethodName    = "/follower_service.FollowerService/AddFollower"
+	FollowerService_DeleteFollower_FullMethodName = "/follower_service.FollowerService/DeleteFollower"
 )
 
 // FollowerServiceClient is the client API for FollowerService service.
@@ -245,7 +245,7 @@ func _FollowerService_DeleteFollower_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var FollowerService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "FollowerService",
+	ServiceName: "follower_service.FollowerService",
 	HandlerType: (*FollowerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FeedService_GetFeed_FullMethodName = "/FeedService/GetFeed"
+	FeedService_GetFeed_FullMethodName = "/feed_service.FeedService/GetFeed"
 )
 
 // FeedServiceClient is the client API for FeedService service.
@@ -108,7 +108,7 @@ func _FeedService_GetFeed_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var FeedService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "FeedService",
+	ServiceName: "feed_service.FeedService",
 	HandlerType: (*FeedServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

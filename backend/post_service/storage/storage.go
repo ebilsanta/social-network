@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/ebilsanta/social-network/backend/post-service/errtypes"
-	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/post-service/proto/generated"
 	_ "github.com/lib/pq"
 )
 

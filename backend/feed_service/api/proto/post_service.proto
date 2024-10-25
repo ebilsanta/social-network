@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package post_service;
+
 option go_package = "github.com/ebilsanta/social-network/backend/feed-service/api/proto";
 
 import "google/protobuf/timestamp.proto";

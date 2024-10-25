@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/ebilsanta/social-network/backend/post-service/errtypes"
-	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/post-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/post-service/storage"
 	"github.com/ebilsanta/social-network/backend/post-service/types"
 	"google.golang.org/grpc/codes"

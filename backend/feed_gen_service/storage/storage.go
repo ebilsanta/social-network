@@ -22,7 +22,7 @@ func NewRedisStore() (*RedisStore, error) {
 	client, err := connectToDB()
 	if err != nil {
 		return nil, err
-}
+	}
 
 	return &RedisStore{Client: client}, nil
 }

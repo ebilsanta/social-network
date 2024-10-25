@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/ebilsanta/social-network/backend/feed-service/api/proto";
+package feed_service;
+
+option go_package = "github.com/ebilsanta/social-network/backend/feed-gen-service/api/proto";
 
 import "post_service.proto";
 
@@ -15,5 +17,6 @@ message GetFeedRequest {
 }
 
 message GetFeedResponse {
-  repeated Post posts = 1;
+  repeated post_service.Post posts = 1;
+  bool fromCache = 2;
 }

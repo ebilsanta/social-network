@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package follower_service;
+
 option go_package = "github.com/ebilsanta/social-network/backend/follower_service/proto";
 
 import "google/protobuf/empty.proto";

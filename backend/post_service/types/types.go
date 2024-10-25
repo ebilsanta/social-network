@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/ebilsanta/social-network/backend/post-service/proto"
+	pb "github.com/ebilsanta/social-network/backend/post-service/proto/generated"
 )
 
 func NewPost(caption, imageURL, userID string) *pb.Post {

@@ -1,0 +1,154 @@
+# a very minimal declarative config file
+_format_version: "3.0"
+_transform: true
+
+services:
+- name: post_service
+  protocol: grpc
+  host: post_service
+  port: 8081
+  routes:
+  - name: get-post-route
+    protocols:
+    - http
+    paths:
+    - /v1/posts/(?<id>[^/]+)
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/post_service.proto
+
+  - name: create-and-get-posts-route
+    protocols:
+    - http
+    paths:
+    - /v1/posts
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/post_service.proto
+
+  - name: get-posts-by-ids-route
+    protocols:
+    - http
+    paths:
+    - /v1/posts/ids
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/post_service.proto
+
+  - name: get-posts-by-user-id-route
+    protocols:
+    - http
+    paths:
+    - /v1/users/(?<id>[^/]+)/posts
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/post_service.proto
+
+  - name: get-posts-by-user-ids-route
+    protocols:
+    - http
+    paths:
+    - /v1/users/posts
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/post_service.proto
+
+- name: follower_service
+  protocol: grpc
+  host: follower_service
+  port: 8082
+  routes:
+  - name: add-user-route
+    protocols:
+    - http
+    paths:
+    - /v1/followers/users
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/follower_service.proto
+
+  - name: get-followers-route
+    protocols:
+    - http
+    paths:
+    - /v1/followers/(?<id>[^/]+)
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/follower_service.proto
+  
+  - name: get-following-route
+    protocols:
+    - http
+    paths:
+    - /v1/following/(?<id>[^/]+)
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/follower_service.proto
+
+  - name: add-follower-route
+    protocols:
+    - http
+    paths:
+    - /v1/followers
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/follower_service.proto
+
+  - name: delete-follower-route
+    protocols:
+    - http
+    paths:
+    - /v1/followers/(?<followerID>[^/]+)/(?<followedID>[^/]+)
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/follower_service.proto
+  
+- name: user-service
+  protocol: grpc
+  host: user_service
+  port: 8083
+  routes:
+  - name: get-user-route
+    protocols:
+    - http
+    paths:
+    - /v1/users/(?<id>[^/]+)
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/user_service.proto
+
+  - name: create-and-get-users-route
+    protocols:
+    - http
+    paths:
+    - /v1/users
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/user_service.proto
+
+- name: feed_service
+  protocol: grpc
+  host: feed_service
+  port: 8084
+  routes:
+  - name: feed-service-route
+    protocols:
+    - http
+    paths:
+    - /v1/feed/(?<userId>[^/]+)
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /opt/kong/protos/feed_service.proto

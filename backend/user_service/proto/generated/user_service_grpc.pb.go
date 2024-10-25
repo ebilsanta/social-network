@@ -20,9 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_GetUser_FullMethodName    = "/UserService/GetUser"
-	UserService_GetUsers_FullMethodName   = "/UserService/GetUsers"
-	UserService_CreateUser_FullMethodName = "/UserService/CreateUser"
+	UserService_GetUser_FullMethodName    = "/user_service.UserService/GetUser"
+	UserService_GetUsers_FullMethodName   = "/user_service.UserService/GetUsers"
+	UserService_CreateUser_FullMethodName = "/user_service.UserService/CreateUser"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -177,7 +177,7 @@ func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "UserService",
+	ServiceName: "user_service.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

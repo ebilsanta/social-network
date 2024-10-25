@@ -1,15 +1,22 @@
 syntax = "proto3";
 
+package post_service;
+
 option go_package = "github.com/ebilsanta/social-network/backend/post_service/proto";
 
 import "google/protobuf/timestamp.proto";
 
 service PostService {
   rpc CreatePost (CreatePostRequest) returns (Post) {}
+  
   rpc GetPost (GetPostRequest) returns (Post) {}
+  
   rpc GetPosts (GetPostsRequest) returns (GetPostsResponse) {}
+  
   rpc GetPostsByPostIds (GetPostsByIdsRequest) returns (GetPostsResponse) {}
+  
   rpc GetPostsByUserId (GetPostsByUserRequest) returns (GetPostsResponse) {}
+  
   rpc GetPostsByUserIds (GetPostsByUsersRequest) returns (GetPostsResponse) {}
 }
 
