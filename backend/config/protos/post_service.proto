@@ -28,20 +28,20 @@ service PostService {
   
   rpc GetPostsByPostIds (GetPostsByIdsRequest) returns (GetPostsResponse) {
     option (google.api.http) = {
-      post: "/v1/posts/ids"
+      get: "/v1/posts/ids"
       body: "*"
     };
   }
   
   rpc GetPostsByUserId (GetPostsByUserRequest) returns (GetPostsResponse) {
     option (google.api.http) = {
-      get: "/v1/users/{id}/posts"
+      get: "/v1/posts/user/{id}"
     };
   }
   
   rpc GetPostsByUserIds (GetPostsByUsersRequest) returns (GetPostsResponse) {
     option (google.api.http) = {
-      post: "/v1/users/posts"
+      get: "/v1/posts/users"
       body: "*"
     };
   }
