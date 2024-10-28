@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
       <body>
         <SessionProvider>
-          <MantineProvider theme={theme}>{children}</MantineProvider>
+          <MantineProvider theme={theme} defaultColorScheme="auto">{children}</MantineProvider>
         </SessionProvider>
       </body>
     </html>

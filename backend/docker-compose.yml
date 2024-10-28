@@ -333,7 +333,7 @@ services:
     volumes:
       - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
       - kong_tmp_vol:/tmp
-      - ./config:/opt/kong
+      - ./kong:/opt/kong
     security_opt:
       - no-new-privileges
 
@@ -370,7 +370,7 @@ services:
 
 secrets:
   kong_postgres_password:
-    file: ./config/KONG_POSTGRES_PASSWORD
+    file: ./kong/KONG_POSTGRES_PASSWORD
 
 volumes:
   post_svc_data:
