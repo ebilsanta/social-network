@@ -8,4 +8,4 @@ backend/post_service/post_svc_data
 backend/follower_service/follower_db/
 backend/user_service/user_db/
 backend/feed_service/feed_db/
-backend/config/protos/protobuf/
+backend/kong/protos/protobuf/
