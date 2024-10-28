@@ -92,6 +92,7 @@ services:
       - SERVER_PORT=${USER_SVC_PORT}
       - MONGODB_URI=mongodb://${USER_DB_ROOT_USERNAME}:${USER_DB_ROOT_PASSWORD}@user_db
       - FOLLOWER_SVC_PORT=${FOLLOWER_SVC_PORT}
+      - KAFKA_BROKER=${KAFKA_BROKER}
     tty: true
     build: ./user_service
     ports:

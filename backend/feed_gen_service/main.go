@@ -41,10 +41,10 @@ func main() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	consumer := api.StartKafkaConsumer(os.Getenv("KAFKA_BROKER"), "posts", quit)
+	consumer := api.StartKafkaConsumer(os.Getenv("KAFKA_BROKER"), quit)
 	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, followerClient, postClient, consumer, quit)
 
 	<-sigchan
 	close(quit)
-	log.Println("Shutting down...")
+	log.Println("Feed gen service shutting down...")
 }

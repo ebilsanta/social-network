@@ -8,13 +8,13 @@ import (
 
 type KafkaProducer struct {
 	producer *kafka.Producer
-	topic    string
 }
 
-func StartKafkaProducer(broker string, topic string, quit chan struct{}) *KafkaProducer {
+func StartKafkaProducer(broker string, quit chan struct{}) *KafkaProducer {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": broker,
-		"acks":              "all",
+		"bootstrap.servers":  broker,
+		"acks":               "all",
+		"enable.idempotence": true,
 	})
 
 	if err != nil {
@@ -25,7 +25,6 @@ func StartKafkaProducer(broker string, topic string, quit chan struct{}) *KafkaP
 
 	kp := &KafkaProducer{
 		producer: p,
-		topic:    topic,
 	}
 
 	go kp.listenEvents(quit)
@@ -33,9 +32,9 @@ func StartKafkaProducer(broker string, topic string, quit chan struct{}) *KafkaP
 	return kp
 }
 
-func (kp *KafkaProducer) Produce(key []byte, value []byte) {
+func (kp *KafkaProducer) Produce(topic string, key []byte, value []byte) {
 	kp.producer.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: &kp.topic, Partition: kafka.PartitionAny},
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Key:            key,
 		Value:          value,
 	}, nil)

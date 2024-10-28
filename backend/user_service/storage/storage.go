@@ -21,6 +21,8 @@ type Storage interface {
 	GetUsers() ([]*pb.User, error)
 	GetUser(string) (*pb.User, error)
 	DeleteUser(string) error
+	UpdatePostCount(string, int32) error
+	UpdateFollowerFollowingCount(string, string, int32) error
 }
 
 type MongoStore struct {
@@ -62,12 +64,15 @@ func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
 	}
 
 	return &pb.User{
-		Id:        result.InsertedID.(primitive.ObjectID).Hex(),
-		Email:     user.Email,
-		Username:  user.Username,
-		ImageURL:  user.ImageURL,
-		CreatedAt: timestamppb.New(user.CreatedAt),
-		DeletedAt: nil,
+		Id:             result.InsertedID.(primitive.ObjectID).Hex(),
+		Email:          user.Email,
+		Username:       user.Username,
+		ImageURL:       user.ImageURL,
+		PostCount:      0,
+		FollowerCount:  0,
+		FollowingCount: 0,
+		CreatedAt:      timestamppb.New(user.CreatedAt),
+		DeletedAt:      nil,
 	}, nil
 }
 
@@ -133,4 +138,53 @@ func decodeUser(user types.User) *pb.User {
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		DeletedAt: deletedAt,
 	}
+}
+
+func (s *MongoStore) UpdatePostCount(id string, change int32) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$inc": bson.M{"postCount": change}}
+
+	_, err = s.collection.UpdateOne(context.TODO(), filter, update)
+	return err
+}
+
+func (s *MongoStore) UpdateFollowerFollowingCount(followerId, followingId string, change int32) error {
+	followerObjID, err := primitive.ObjectIDFromHex(followerId)
+	if err != nil {
+		return err
+	}
+
+	followingObjID, err := primitive.ObjectIDFromHex(followingId)
+	if err != nil {
+		return err
+	}
+
+	followerFilter := bson.M{"_id": followerObjID}
+	followingFilter := bson.M{"_id": followingObjID}
+
+	followerUpdate := bson.M{"$inc": bson.M{"followingCount": change}}
+	followingUpdate := bson.M{"$inc": bson.M{"followerCount": change}}
+
+	session, err := s.Client.StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(context.Background())
+
+	err = mongo.WithSession(context.Background(), session, func(sc mongo.SessionContext) error {
+		if _, err := s.collection.UpdateOne(sc, followerFilter, followerUpdate); err != nil {
+			return err
+		}
+		if _, err := s.collection.UpdateOne(sc, followingFilter, followingUpdate); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
 }

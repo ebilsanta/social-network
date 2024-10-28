@@ -39,7 +39,9 @@ func (s *PostServiceServer) CreatePost(ctx context.Context, req *pb.CreatePostRe
 	key := []byte(req.UserId)
 	value := []byte(strconv.FormatInt(dbPost.Id, 10))
 
-	s.producer.Produce(key, value)
+	s.producer.Produce("new-post.notification", key, value)
+	s.producer.Produce("new-post.update-feed", key, value)
+	s.producer.Produce("new-post.update-profile", key, value)
 
 	return dbPost, nil
 }

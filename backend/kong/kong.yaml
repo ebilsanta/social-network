@@ -42,7 +42,7 @@ services:
     protocols:
     - http
     paths:
-    - /v1/users/(?<id>[^/]+)/posts
+    - /v1/posts/user/(?<id>[^/]+)
     plugins:
     - name: grpc-gateway
       config:
@@ -52,7 +52,7 @@ services:
     protocols:
     - http
     paths:
-    - /v1/users/posts
+    - /v1/posts/users
     plugins:
     - name: grpc-gateway
       config:
@@ -153,44 +153,39 @@ services:
       config:
         proto: /opt/kong/protos/feed_service.proto
 
-consumers:
-- username: frontend
-  jwt_secrets:
-  - algorithm: HS256
-    secret: secret
-    key: issuer
+# consumers:
+# - username: frontend
+#   jwt_secrets:
+#   - algorithm: HS256
+#     secret: secret
+#     key: issuer
   
-plugins:
-- name: cors
-  config:
-    origins:
-    - http://localhost:3000
-    methods:
-    - GET
-    - POST
-    - PUT
-    - PATCH
-    - DELETE
-    headers:
-    - Accept
-    - Accept-Version
-    - Content-Length
-    - Content-MD5
-    - Content-Type
-    - Date
-    credentials: true
-    max_age: 3600
+# plugins:
+# - name: cors
+#   config:
+#     origins:
+#     - http://localhost:3000
+#     methods:
+#     - GET
+#     - POST
+#     - PUT
+#     - PATCH
+#     - DELETE
+#     headers:
+#     - Accept
+#     - Accept-Version
+#     - Content-Length
+#     - Content-MD5
+#     - Content-Type
+#     - Date
+#     credentials: true
+#     max_age: 3600
 
-- name: jwt
-  enabled: true
-  config:
-   key_claim_name: iss
-   claims_to_verify:
-    - exp
-   cookie_names:
-   - next-auth.session-token
-
-
-
-
-
+# - name: jwt
+#   enabled: true
+#   config:
+#    key_claim_name: iss
+#    claims_to_verify:
+#     - exp
+#    cookie_names:
+#    - next-auth.session-token

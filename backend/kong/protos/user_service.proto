@@ -42,11 +42,16 @@ message GetUsersResponse {
   repeated User users = 1;
 }
 
+
 message User {
   string id = 1;
   string email = 2;
   string username = 3;
   string imageURL = 4;
-  google.protobuf.Timestamp createdAt = 5;
-  google.protobuf.Timestamp deletedAt = 6;
+  int32 postCount = 5;
+  int32 followerCount = 6;
+  int32 followingCount = 7;
+  google.protobuf.Timestamp createdAt = 8;
+  google.protobuf.Timestamp deletedAt = 9;
 }
+

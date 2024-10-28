@@ -37,8 +37,11 @@ func (s *FeedGenServiceServer) StartPostsListener(quit chan struct{}) {
 				ev, err := s.consumer.ReadMessage(100 * time.Millisecond)
 				if err == nil {
 					userId, postId := string(ev.Key), string(ev.Value)
-					log.Default().Printf("Consumed message: userId: %s, postId: %s\n", userId, postId)
-					s.updateFeeds(userId, postId)
+					switch *ev.TopicPartition.Topic {
+					case "new-post.update-feed":
+						log.Default().Printf("Update feed: userId: %s, postId: %s\n", userId, postId)
+						s.updateFeeds(userId, postId)
+					}
 				}
 			}
 		}
