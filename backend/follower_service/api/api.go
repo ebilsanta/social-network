@@ -1,11 +1,13 @@
-package main
+package api
 
 import (
 	"context"
 	"errors"
 	"log"
 
+	"github.com/ebilsanta/social-network/backend/follower-service/errtypes"
 	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
+	"github.com/ebilsanta/social-network/backend/follower-service/storage"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -13,10 +15,10 @@ import (
 
 type FollowerServiceServer struct {
 	pb.UnimplementedFollowerServiceServer
-	store Storage
+	store storage.Storage
 }
 
-func newServer(store Storage) *FollowerServiceServer {
+func NewServer(store storage.Storage) *FollowerServiceServer {
 	return &FollowerServiceServer{
 		store: store,
 	}
@@ -68,12 +70,12 @@ func (s *FollowerServiceServer) DeleteFollower(ctx context.Context, req *pb.Dele
 }
 
 func HandleError(err error) error {
-	var notFoundErr *UserNotFoundError
+	var notFoundErr *errtypes.UserNotFoundError
 	if errors.As(err, &notFoundErr) {
 		return status.Errorf(codes.NotFound, "user with id %s not found", notFoundErr.UserID)
 	}
 
-	var neo4jErr *Neo4jError
+	var neo4jErr *errtypes.Neo4jError
 	if errors.As(err, &neo4jErr) {
 		return status.Errorf(codes.Internal, "neo4j database error: %v", neo4jErr)
 	}

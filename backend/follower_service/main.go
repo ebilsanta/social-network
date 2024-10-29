@@ -6,16 +6,18 @@ import (
 	"net"
 	"os"
 
+	"github.com/ebilsanta/social-network/backend/follower-service/api"
 	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
+	"github.com/ebilsanta/social-network/backend/follower-service/storage"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	store, err := NewGraphStore()
+	store, err := storage.NewGraphStore()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer store.driver.Close(store.ctx)
+	defer store.Driver.Close(store.Ctx)
 
 	if err := store.Init(); err != nil {
 		log.Fatal(err)
@@ -27,6 +29,6 @@ func main() {
 	}
 	log.Default().Println("Follower service running on port:", os.Getenv("SERVER_PORT"))
 	grpcServer := grpc.NewServer()
-	pb.RegisterFollowerServiceServer(grpcServer, newServer(store))
+	pb.RegisterFollowerServiceServer(grpcServer, api.NewServer(store))
 	grpcServer.Serve(lis)
 }

@@ -1,10 +1,11 @@
-package main
+package storage
 
 import (
 	"context"
 	"fmt"
 	"os"
 
+	"github.com/ebilsanta/social-network/backend/follower-service/errtypes"
 	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
@@ -18,8 +19,8 @@ type Storage interface {
 }
 
 type GraphStore struct {
-	driver neo4j.DriverWithContext
-	ctx    context.Context
+	Driver neo4j.DriverWithContext
+	Ctx    context.Context
 }
 
 func NewGraphStore() (*GraphStore, error) {
@@ -29,7 +30,7 @@ func NewGraphStore() (*GraphStore, error) {
 		return nil, err
 	}
 
-	return &GraphStore{driver: driver, ctx: ctx}, nil
+	return &GraphStore{Driver: driver, Ctx: ctx}, nil
 }
 
 func connectToDB(ctx context.Context) (neo4j.DriverWithContext, error) {
@@ -61,7 +62,7 @@ func (s *GraphStore) Init() error {
 		// "MATCH (user1:User {id: '3'}), (user2:User {id: '2'}) MERGE (user1)-[:FOLLOWS]->(user2)",
 	}
 	for _, query := range queries {
-		_, err := neo4j.ExecuteQuery(ctx, s.driver,
+		_, err := neo4j.ExecuteQuery(ctx, s.Driver,
 			query,
 			nil,
 			neo4j.EagerResultTransformer,
@@ -76,7 +77,7 @@ func (s *GraphStore) Init() error {
 func (s *GraphStore) AddUser(userID string) error {
 	ctx := context.Background()
 	query := `MERGE (u:User {id: $id}) RETURN u`
-	_, err := neo4j.ExecuteQuery(ctx, s.driver,
+	_, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		map[string]any{
 			"id": userID,
@@ -94,16 +95,16 @@ func (s *GraphStore) AddUser(userID string) error {
 func (s *GraphStore) GetFollowers(userID string) ([]*pb.GraphUser, error) {
 	exists, err := s.UserExists(userID)
 	if err != nil {
-		return nil, NewNeo4jError("checking if user exists", err)
+		return nil, errtypes.NewNeo4jError("checking if user exists", err)
 	}
 	if !exists {
-		return nil, NewUserNotFoundError(userID)
+		return nil, errtypes.NewUserNotFoundError(userID)
 	}
 
 	ctx := context.Background()
 	query := `MATCH (:User {id: $id})<-[:FOLLOWS]-(follower)
 			RETURN follower.id`
-	result, err := neo4j.ExecuteQuery(ctx, s.driver,
+	result, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		map[string]any{
 			"id": userID,
@@ -133,16 +134,16 @@ func (s *GraphStore) GetFollowers(userID string) ([]*pb.GraphUser, error) {
 func (s *GraphStore) GetFollowing(userID string) ([]*pb.GraphUser, error) {
 	exists, err := s.UserExists(userID)
 	if err != nil {
-		return nil, NewNeo4jError("checking if user exists", err)
+		return nil, errtypes.NewNeo4jError("checking if user exists", err)
 	}
 	if !exists {
-		return nil, NewUserNotFoundError(userID)
+		return nil, errtypes.NewUserNotFoundError(userID)
 	}
 
 	ctx := context.Background()
 	query := `MATCH (:User {id: $id})-[:FOLLOWS]->(followed)
 			RETURN followed.id`
-	result, err := neo4j.ExecuteQuery(ctx, s.driver,
+	result, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		map[string]any{
 			"id": userID,
@@ -176,10 +177,10 @@ func (s *GraphStore) AddFollower(followerID, followedID string) error {
 
 	exists, err := s.UserExists(followerID)
 	if err != nil {
-		return NewNeo4jError("checking if follower exists", err)
+		return errtypes.NewNeo4jError("checking if follower exists", err)
 	}
 	if !exists {
-		return NewUserNotFoundError(followerID)
+		return errtypes.NewUserNotFoundError(followerID)
 	}
 
 	exists, err = s.UserExists(followedID)
@@ -187,7 +188,7 @@ func (s *GraphStore) AddFollower(followerID, followedID string) error {
 		return err
 	}
 	if !exists {
-		return NewUserNotFoundError(followedID)
+		return errtypes.NewUserNotFoundError(followedID)
 	}
 
 	exists, err = s.UserFollows(followerID, followedID)
@@ -207,7 +208,7 @@ func (s *GraphStore) AddFollower(followerID, followedID string) error {
 	}
 	query = `MATCH (follower:User {id: $followerID}), (followed:User {id: $followedID}) 
 			MERGE (follower)-[:FOLLOWS]->(followed)`
-	_, err = neo4j.ExecuteQuery(ctx, s.driver,
+	_, err = neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		params,
 		neo4j.EagerResultTransformer,
@@ -223,18 +224,18 @@ func (s *GraphStore) AddFollower(followerID, followedID string) error {
 func (s *GraphStore) DeleteFollower(followerID, followedID string) error {
 	exists, err := s.UserExists(followerID)
 	if err != nil {
-		return NewNeo4jError("checking if follower exists", err)
+		return errtypes.NewNeo4jError("checking if follower exists", err)
 	}
 	if !exists {
-		return NewUserNotFoundError(followerID)
+		return errtypes.NewUserNotFoundError(followerID)
 	}
 
 	exists, err = s.UserExists(followedID)
 	if err != nil {
-		return NewNeo4jError("checking if followed exists", err)
+		return errtypes.NewNeo4jError("checking if followed exists", err)
 	}
 	if !exists {
-		return NewUserNotFoundError(followerID)
+		return errtypes.NewUserNotFoundError(followerID)
 	}
 
 	exists, err = s.UserFollows(followerID, followedID)
@@ -252,7 +253,7 @@ func (s *GraphStore) DeleteFollower(followerID, followedID string) error {
 		"followerID": followerID,
 		"followedID": followedID,
 	}
-	_, err = neo4j.ExecuteQuery(ctx, s.driver,
+	_, err = neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		params,
 		neo4j.EagerResultTransformer,
@@ -268,7 +269,7 @@ func (s *GraphStore) DeleteFollower(followerID, followedID string) error {
 func (s *GraphStore) UserExists(userID string) (bool, error) {
 	ctx := context.Background()
 	query := `MATCH (u:User {id: $id}) RETURN u`
-	result, err := neo4j.ExecuteQuery(ctx, s.driver,
+	result, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		map[string]any{
 			"id": userID,
@@ -296,7 +297,7 @@ func (s *GraphStore) UserFollows(followerID, followedID string) (bool, error) {
 		"followedID": followedID,
 	}
 
-	result, err := neo4j.ExecuteQuery(ctx, s.driver,
+	result, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		checkQuery,
 		checkParams,
 		neo4j.EagerResultTransformer,
