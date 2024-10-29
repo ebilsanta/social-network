@@ -8,14 +8,15 @@ import (
 
 func StartKafkaConsumer(broker string, quit chan struct{}) *kafka.Consumer {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": broker,
-		"group.id":          "user-service",
+		"bootstrap.servers":    broker,
+		"group.id":             "user-service",
+		"max.poll.interval.ms": 60000,
 	})
 
 	if err != nil {
 		log.Fatalf("Failed to create consumer: %s\n", err)
 	}
-	topics := []string{"new-post.update-profile", "new-follower.update-profile"}
+	topics := []string{"new-post.update-profile", "new-follower.update-profile", "delete-follower.update-profile"}
 	err = c.SubscribeTopics(topics, nil)
 	if err != nil {
 		log.Fatalf("Failed to subscribe to topic: %s\n", err)

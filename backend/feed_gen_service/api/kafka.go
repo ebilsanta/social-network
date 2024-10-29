@@ -8,8 +8,9 @@ import (
 
 func StartKafkaConsumer(broker string, quit chan struct{}) *kafka.Consumer {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": broker,
-		"group.id":          "feed-gen-service",
+		"bootstrap.servers":    broker,
+		"group.id":             "feed-gen-service",
+		"max.poll.interval.ms": 60000,
 	})
 
 	if err != nil {
