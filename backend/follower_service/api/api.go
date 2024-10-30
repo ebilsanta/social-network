@@ -15,12 +15,14 @@ import (
 
 type FollowerServiceServer struct {
 	pb.UnimplementedFollowerServiceServer
-	store storage.Storage
+	store    storage.Storage
+	producer *KafkaProducer
 }
 
-func NewServer(store storage.Storage) *FollowerServiceServer {
+func NewServer(store storage.Storage, producer *KafkaProducer) *FollowerServiceServer {
 	return &FollowerServiceServer{
-		store: store,
+		store:    store,
+		producer: producer,
 	}
 }
 
@@ -57,6 +59,10 @@ func (s *FollowerServiceServer) AddFollower(ctx context.Context, req *pb.AddFoll
 	if err != nil {
 		return nil, HandleError(err)
 	}
+	followerId := []byte(req.FollowerID)
+	followedId := []byte(req.FollowedID)
+	s.producer.Produce("new-follower.update-profile", followerId, followedId)
+	s.producer.Produce("new-follower.notification", followerId, followedId)
 	return nil, nil
 }
 
@@ -66,6 +72,9 @@ func (s *FollowerServiceServer) DeleteFollower(ctx context.Context, req *pb.Dele
 	if err != nil {
 		return nil, HandleError(err)
 	}
+	followerId := []byte(req.FollowerID)
+	followedId := []byte(req.FollowedID)
+	s.producer.Produce("delete-follower.update-profile", followerId, followedId)
 	return nil, nil
 }
 

@@ -22,7 +22,7 @@ service FollowerService {
 
   rpc GetFollowing (GetFollowingRequest) returns (GetFollowingResponse) {
     option (google.api.http) = {
-      get: "/v1/following/{id}"
+      get: "/v1/followings/{id}"
     };
   }
 

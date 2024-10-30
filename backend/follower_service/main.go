@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/ebilsanta/social-network/backend/follower-service/api"
-	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/follower-service/storage"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -23,12 +21,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	log.Default().Println("Follower service running on port:", os.Getenv("SERVER_PORT"))
-	grpcServer := grpc.NewServer()
-	pb.RegisterFollowerServiceServer(grpcServer, api.NewServer(store))
-	grpcServer.Serve(lis)
+	quit := make(chan struct{})
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+
+	producer := api.StartKafkaProducer(os.Getenv("KAFKA_BROKER"), quit)
+	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, producer, quit)
+
+	<-sigchan
+	close(quit)
+	log.Println("Shutting down...")
 }

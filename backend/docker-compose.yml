@@ -60,6 +60,7 @@ services:
       - DB_URI=${FOLLOWER_DB_URI}
       - DB_USER=${FOLLOWER_DB_USER}
       - DB_PASSWORD=${FOLLOWER_DB_PASSWORD}
+      - KAFKA_BROKER=${KAFKA_BROKER} 
     tty: true
     build: ./follower_service
     ports:

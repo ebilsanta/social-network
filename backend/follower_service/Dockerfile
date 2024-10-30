@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.22
+FROM --platform=linux/amd64 golang:1.22
 
 # Set destination for COPY
 WORKDIR /app
@@ -11,12 +11,10 @@ RUN go mod download
 
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/engine/reference/builder/#copy
-COPY *.go ./
-
-COPY proto ./proto
+COPY . .
 
 # Build
-RUN CGO_ENABLED=0 go build -o /follower-service
+RUN CGO_ENABLED=1 go build -o /follower-service
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.
