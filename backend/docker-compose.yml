@@ -18,12 +18,12 @@ services:
       - DB_PORT=${POST_SVC_DB_PORT}
       - KAFKA_BROKER=${KAFKA_BROKER}
     tty: true
-    build: ./post_service
+    build: ./simple_services/post_service
     ports:
       - "${POST_SVC_PORT}:${POST_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./post_service:/app
+      - ./simple_services/post_service:/app
     depends_on:
       post_db:
         condition: service_healthy
@@ -43,7 +43,7 @@ services:
     ports:
       - "1234:5432"
     volumes:
-      - ./post_service/post_svc_data:/var/lib/postgresql/data
+      - ./simple_services/post_service/post_svc_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "${POST_SVC_DB_NAME}"]
       interval: 30s
@@ -62,12 +62,12 @@ services:
       - DB_PASSWORD=${FOLLOWER_DB_PASSWORD}
       - KAFKA_BROKER=${KAFKA_BROKER} 
     tty: true
-    build: ./follower_service
+    build: ./simple_services/follower_service
     ports:
       - "${FOLLOWER_SVC_PORT}:${FOLLOWER_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./follower_service:/app
+      - ./simple_services/follower_service:/app
     depends_on:
       - follower_db
     networks:
@@ -83,7 +83,7 @@ services:
       - "7474:7474"
       - "7687:7687"
     volumes:
-      - ./follower_service/follower_db:/data
+      - ./simple_services/follower_service/follower_db:/data
     networks:
       - social_network
 
@@ -95,12 +95,12 @@ services:
       - FOLLOWER_SVC_PORT=${FOLLOWER_SVC_PORT}
       - KAFKA_BROKER=${KAFKA_BROKER}
     tty: true
-    build: ./user_service
+    build: ./simple_services/user_service
     ports:
       - "${USER_SVC_PORT}:${USER_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./user_service:/app
+      - ./simple_services/user_service:/app
     depends_on:
       - user_db
     networks:
@@ -116,7 +116,7 @@ services:
     restart:
       always
     volumes:
-      - ./user_service/user_db:/data
+      - ./simple_services/user_service/user_db:/data
     ports:
       - "12345:27017"
     networks:
@@ -130,12 +130,12 @@ services:
       - FOLLOWER_SVC_PORT=${FOLLOWER_SVC_PORT}
       - POST_SVC_PORT=${POST_SVC_PORT}
     tty: true
-    build: ./feed_service
+    build: ./simple_services/feed_service
     ports:
       - "${FEED_SVC_PORT}:${FEED_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./feed_service:/app
+      - ./simple_services/feed_service:/app
     depends_on:
       - feed_db
     networks:
@@ -149,7 +149,7 @@ services:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass ${FEED_DB_PASSWORD}
     volumes: 
-      - ./feed_service/feed_db:/data
+      - ./simple_services/feed_service/feed_db:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     networks:
@@ -164,12 +164,12 @@ services:
       - POST_SVC_PORT=${POST_SVC_PORT}
       - KAFKA_BROKER=${KAFKA_BROKER}
     tty: true
-    build: ./feed_gen_service
+    build: ./simple_services/feed_gen_service
     ports:
       - "${FEED_GEN_SVC_PORT}:${FEED_GEN_SVC_PORT}"
     restart: on-failure
     volumes:
-      - ./feed_gen_service:/app
+      - ./simple_services/feed_gen_service:/app
     depends_on:
       feed_db:
         condition: service_healthy

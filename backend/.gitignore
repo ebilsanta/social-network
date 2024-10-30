@@ -1,0 +1,11 @@
+.env
+tmp/
+bin/
+**/main
+
+# for local dev
+simple_services/post_service/post_svc_data
+simple_services/follower_service/follower_db/
+simple_services/user_service/user_db/
+simple_services/feed_service/feed_db/
+kong/protos/protobuf/

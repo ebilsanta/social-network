@@ -28,3 +28,9 @@ message GetFeedResponse {
   repeated post_service.Post posts = 1;
   bool fromCache = 2;
 }
+
+message GetFeedRequest {
+  string userId = 1;
+  int32 offset = 2;
+  int32 limit = 3;
+}

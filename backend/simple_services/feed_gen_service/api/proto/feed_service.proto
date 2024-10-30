@@ -17,6 +17,15 @@ message GetFeedRequest {
 }
 
 message GetFeedResponse {
-  repeated post_service.Post posts = 1;
+  repeated post_service.Post data = 1;
   bool fromCache = 2;
+  PaginationMetadata pagination = 3;
+}
+
+message PaginationMetadata {
+  int32 totalRecords = 1;
+  int32 currentPage = 2;
+  int32 totalPages = 3;
+  int32 nextPage = 4;
+  bool prevPage = 5;
 }
