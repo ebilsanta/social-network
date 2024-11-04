@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package follower_service;
+
+option go_package = "github.com/ebilsanta/social-network/backend/feed-service/api/proto";
+
+import "google/protobuf/empty.proto";
+
+service FollowerService {
+  rpc AddUser (AddUserRequest) returns (google.protobuf.Empty) {}
+  rpc GetFollowers (GetFollowersRequest) returns (GetFollowersResponse) {}
+  rpc GetFollowing (GetFollowingRequest) returns (GetFollowingResponse) {}
+  rpc AddFollower (AddFollowerRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteFollower (DeleteFollowerRequest) returns (google.protobuf.Empty) {}
+}
+
+message AddUserRequest {
+  string id = 1;
+}
+
+message GetFollowersRequest {
+  string id = 1;
+}
+
+message GetFollowersResponse {
+  repeated GraphUser followers = 1;
+}
+
+message GetFollowingRequest {
+  string id = 1;
+}
+
+message GetFollowingResponse {
+  repeated GraphUser following = 1;
+}
+
+message AddFollowerRequest {
+  string followerID = 1;
+  string followedID = 2;
+}
+
+message DeleteFollowerRequest {
+  string followerID = 1;
+  string followedID = 2;
+}
+
+message GraphUser {
+  string id = 1;
+}
