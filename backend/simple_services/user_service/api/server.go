@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -20,7 +21,7 @@ func StartGRPCServer(port string, store storage.Storage, followerClient pb.Follo
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
 	server := NewServer(store, followerClient, consumer)
 	go server.StartUsersListener(quit)
 
@@ -34,4 +35,23 @@ func StartGRPCServer(port string, store storage.Storage, followerClient pb.Follo
 
 	<-quit
 	grpcServer.Stop()
+}
+
+func loggingInterceptor(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	log.Printf("Received request for method: %s", info.FullMethod)
+
+	resp, err := handler(ctx, req)
+
+	if err != nil {
+		log.Printf("Error calling method %s: %v", info.FullMethod, err)
+	} else {
+		log.Printf("Successfully called method %s", info.FullMethod)
+	}
+
+	return resp, err
 }

@@ -9,7 +9,6 @@ import (
 	pb "github.com/ebilsanta/social-network/backend/user-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/user-service/storage"
 	"github.com/ebilsanta/social-network/backend/user-service/types"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UserServiceServer struct {
@@ -28,7 +27,7 @@ func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, c
 }
 
 func (s *UserServiceServer) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	user := types.NewUser(req.Email, req.Username, req.ImageURL)
+	user := types.NewUser(req.Id, req.Email, req.Name, req.Username, req.Image)
 	log.Default().Printf("user_service CreateUser request: %v", user)
 	dbUser, err := s.store.CreateUser(user)
 
@@ -53,12 +52,12 @@ func (s *UserServiceServer) GetUser(ctx context.Context, req *pb.GetUserRequest)
 	return user, nil
 }
 
-func (s *UserServiceServer) GetUsers(ctx context.Context, req *emptypb.Empty) (*pb.GetUsersResponse, error) {
-	users, err := s.store.GetUsers()
+func (s *UserServiceServer) GetUsers(ctx context.Context, req *pb.GetUsersRequest) (*pb.GetUsersResponse, error) {
+	res, err := s.store.GetUsers(req.Query, req.Page, req.Limit)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.GetUsersResponse{Users: users}, nil
+	return res, nil
 }
 
 func (s *UserServiceServer) StartUsersListener(quit chan struct{}) {

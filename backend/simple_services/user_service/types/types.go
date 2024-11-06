@@ -2,26 +2,32 @@ package types
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type User struct {
-	Id        primitive.ObjectID `bson:"_id"`
-	Email     string             `bson:"email"`
-	Username  string             `bson:"username"`
-	ImageURL  string             `bson:"imageURL"`
-	CreatedAt time.Time          `bson:"createdAt"`
-	DeletedAt *time.Time         `bson:"deletedAt"`
+	Id             string     `bson:"id"`
+	Email          string     `bson:"email"`
+	Name           string     `bson:"name"`
+	Username       string     `bson:"username"`
+	Image          string     `bson:"image"`
+	PostCount      uint32     `bson:"postCount"`
+	FollowerCount  uint32     `bson:"followerCount"`
+	FollowingCount uint32     `bson:"followingCount"`
+	CreatedAt      time.Time  `bson:"createdAt"`
+	DeletedAt      *time.Time `bson:"deletedAt"`
 }
 
-func NewUser(email, username, imageURL string) *User {
+func NewUser(id, email, name, username, image string) *User {
 	return &User{
-		Id:        primitive.NewObjectID(),
-		Email:     email,
-		Username:  username,
-		ImageURL:  imageURL,
-		CreatedAt: time.Now(),
-		DeletedAt: nil,
+		Id:             id,
+		Email:          email,
+		Name:           name,
+		Username:       username,
+		Image:          image,
+		PostCount:      0,
+		FollowerCount:  0,
+		FollowingCount: 0,
+		CreatedAt:      time.Now(),
+		DeletedAt:      nil,
 	}
 }

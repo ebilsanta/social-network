@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	pb "github.com/ebilsanta/social-network/backend/user-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/user-service/types"
@@ -18,7 +19,7 @@ import (
 
 type Storage interface {
 	CreateUser(*types.User) (*pb.User, error)
-	GetUsers() ([]*pb.User, error)
+	GetUsers(string, int64, int64) (*pb.GetUsersResponse, error)
 	GetUser(string) (*pb.User, error)
 	DeleteUser(string) error
 	UpdatePostCount(string, int32) error
@@ -36,6 +37,19 @@ func NewMongoStore() (*MongoStore, error) {
 		return nil, err
 	}
 	collection := client.Database("user").Collection("user")
+
+	// Enable text searches on username field
+	usernameIndex := mongo.IndexModel{Keys: bson.D{{Key: "username", Value: "text"}}}
+
+	idIndex := mongo.IndexModel{
+		Keys: bson.D{{Key: "id", Value: 1}},
+	}
+
+	_, err = collection.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{usernameIndex, idIndex})
+	if err != nil {
+		return nil, err
+	}
+
 	return &MongoStore{Client: client, collection: collection}, nil
 }
 
@@ -57,17 +71,18 @@ func connectToDB() (*mongo.Client, error) {
 }
 
 func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
-	result, err := s.collection.InsertOne(context.TODO(), user)
+	_, err := s.collection.InsertOne(context.TODO(), user)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &pb.User{
-		Id:             result.InsertedID.(primitive.ObjectID).Hex(),
+		Id:             user.Id,
 		Email:          user.Email,
+		Name:           user.Name,
 		Username:       user.Username,
-		ImageURL:       user.ImageURL,
+		Image:          user.Image,
 		PostCount:      0,
 		FollowerCount:  0,
 		FollowingCount: 0,
@@ -76,8 +91,24 @@ func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
 	}, nil
 }
 
-func (s *MongoStore) GetUsers() ([]*pb.User, error) {
-	cursor, err := s.collection.Find(context.TODO(), bson.D{{}})
+func (s *MongoStore) GetUsers(query string, page, limit int64) (*pb.GetUsersResponse, error) {
+	filter := bson.M{
+		"username": bson.M{
+			"$regex":   query,
+			"$options": "i",
+		},
+	}
+	totalRecords, err := s.collection.CountDocuments(context.TODO(), filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := (totalRecords + limit - 1) / limit
+	skip := (page - 1) * limit
+
+	findOpt := options.Find().SetSkip(skip).SetLimit(limit)
+	cursor, err := s.collection.Find(context.TODO(), filter, findOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -97,17 +128,31 @@ func (s *MongoStore) GetUsers() ([]*pb.User, error) {
 		return nil, err
 	}
 
-	return users, nil
+	var nextPage, prevPage *wrapperspb.Int64Value
+	if page < totalPages {
+		next := page + 1
+		nextPage = &wrapperspb.Int64Value{Value: next}
+	}
+	if page > 1 {
+		prev := page - 1
+		prevPage = &wrapperspb.Int64Value{Value: prev}
+	}
+
+	return &pb.GetUsersResponse{
+		Data: users,
+		Pagination: &pb.UserPaginationMetadata{
+			TotalRecords: totalRecords,
+			CurrentPage:  page,
+			TotalPages:   totalPages,
+			NextPage:     nextPage,
+			PrevPage:     prevPage,
+		},
+	}, nil
 }
 
 func (s *MongoStore) GetUser(id string) (*pb.User, error) {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
 	var user types.User
-	if err := s.collection.FindOne(context.TODO(), primitive.M{"_id": objID}).Decode(&user); err != nil {
+	if err := s.collection.FindOne(context.TODO(), primitive.M{"id": id}).Decode(&user); err != nil {
 		return nil, err
 	}
 
@@ -115,12 +160,7 @@ func (s *MongoStore) GetUser(id string) (*pb.User, error) {
 }
 
 func (s *MongoStore) DeleteUser(id string) error {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.collection.DeleteOne(context.TODO(), primitive.M{"_id": objID})
+	_, err := s.collection.DeleteOne(context.TODO(), primitive.M{"id": id})
 	return err
 }
 
@@ -131,41 +171,30 @@ func decodeUser(user types.User) *pb.User {
 	}
 
 	return &pb.User{
-		Id:        user.Id.Hex(),
-		Email:     user.Email,
-		Username:  user.Username,
-		ImageURL:  user.ImageURL,
-		CreatedAt: timestamppb.New(user.CreatedAt),
-		DeletedAt: deletedAt,
+		Id:             user.Id,
+		Email:          user.Email,
+		Name:           user.Name,
+		Username:       user.Username,
+		Image:          user.Image,
+		PostCount:      user.PostCount,
+		FollowerCount:  user.FollowerCount,
+		FollowingCount: user.FollowingCount,
+		CreatedAt:      timestamppb.New(user.CreatedAt),
+		DeletedAt:      deletedAt,
 	}
 }
 
 func (s *MongoStore) UpdatePostCount(id string, change int32) error {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-
-	filter := bson.M{"_id": objID}
+	filter := bson.M{"id": id}
 	update := bson.M{"$inc": bson.M{"postCount": change}}
 
-	_, err = s.collection.UpdateOne(context.TODO(), filter, update)
+	_, err := s.collection.UpdateOne(context.TODO(), filter, update)
 	return err
 }
 
 func (s *MongoStore) UpdateFollowerFollowingCount(followerId, followingId string, change int32) error {
-	followerObjID, err := primitive.ObjectIDFromHex(followerId)
-	if err != nil {
-		return err
-	}
-
-	followingObjID, err := primitive.ObjectIDFromHex(followingId)
-	if err != nil {
-		return err
-	}
-
-	followerFilter := bson.M{"_id": followerObjID}
-	followingFilter := bson.M{"_id": followingObjID}
+	followerFilter := bson.M{"id": followerId}
+	followingFilter := bson.M{"id": followerId}
 
 	followerUpdate := bson.M{"$inc": bson.M{"followingCount": change}}
 	followingUpdate := bson.M{"$inc": bson.M{"followerCount": change}}
