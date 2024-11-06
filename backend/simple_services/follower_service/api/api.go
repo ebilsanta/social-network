@@ -37,20 +37,20 @@ func (s *FollowerServiceServer) AddUser(ctx context.Context, req *pb.AddUserRequ
 
 func (s *FollowerServiceServer) GetFollowers(ctx context.Context, req *pb.GetFollowersRequest) (*pb.GetFollowersResponse, error) {
 	log.Default().Printf("follower_service GetFollowers request: %v", req)
-	followers, err := s.store.GetFollowers(req.Id)
+	followers, err := s.store.GetFollowers(req.Id, req.Page, req.Limit)
 	if err != nil {
 		return nil, HandleError(err)
 	}
-	return &pb.GetFollowersResponse{Followers: followers}, nil
+	return followers, nil
 }
 
 func (s *FollowerServiceServer) GetFollowing(ctx context.Context, req *pb.GetFollowingRequest) (*pb.GetFollowingResponse, error) {
 	log.Default().Printf("follower_service GetFollowing request: %v", req)
-	following, err := s.store.GetFollowing(req.Id)
+	following, err := s.store.GetFollowing(req.Id, req.Page, req.Limit)
 	if err != nil {
 		return nil, HandleError(err)
 	}
-	return &pb.GetFollowingResponse{Following: following}, nil
+	return following, nil
 }
 
 func (s *FollowerServiceServer) AddFollower(ctx context.Context, req *pb.AddFollowerRequest) (*emptypb.Empty, error) {

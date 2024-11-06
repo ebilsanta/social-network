@@ -130,12 +130,10 @@ func (s *MongoStore) GetUsers(query string, page, limit int64) (*pb.GetUsersResp
 
 	var nextPage, prevPage *wrapperspb.Int32Value
 	if page < totalPages {
-		next := page + 1
-		nextPage = &wrapperspb.Int32Value{Value: int32(next)}
+		nextPage = &wrapperspb.Int32Value{Value: int32(page + 1)}
 	}
 	if page > 1 {
-		prev := page - 1
-		prevPage = &wrapperspb.Int32Value{Value: int32(prev)}
+		prevPage = &wrapperspb.Int32Value{Value: int32(page - 1)}
 	}
 
 	return &pb.GetUsersResponse{

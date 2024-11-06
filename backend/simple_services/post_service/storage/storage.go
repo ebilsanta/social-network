@@ -197,7 +197,11 @@ func (s *PostgresStore) GetPostsByUserId(id string, page, limit int32) (*pb.GetP
 		posts = append(posts, post)
 	}
 
-	totalPages := (totalRecords + limit) - 1/limit
+	totalPages := totalRecords / limit
+	if totalRecords%limit > 0 {
+		totalPages++
+	}
+
 	var nextPage, prevPage *wrapperspb.Int32Value
 	if page < totalPages {
 		next := page + 1

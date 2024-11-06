@@ -93,7 +93,7 @@ func (s *RedisStore) GetFeed(id string, page, limit int32) (*pb.GetFeedResponse,
 	}
 
 	totalPages := int32(totalRecords) / limit
-	if totalRecords%int64(limit) > 0 {
+	if totalRecords % int64(limit) > 0 {
 		totalPages++
 	}
 

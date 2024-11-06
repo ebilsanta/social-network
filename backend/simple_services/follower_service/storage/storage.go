@@ -8,12 +8,13 @@ import (
 	"github.com/ebilsanta/social-network/backend/follower-service/errtypes"
 	pb "github.com/ebilsanta/social-network/backend/follower-service/proto/generated"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type Storage interface {
 	AddUser(string) error
-	GetFollowers(string) ([]*pb.GraphUser, error)
-	GetFollowing(string) ([]*pb.GraphUser, error)
+	GetFollowers(string, int32, int32) (*pb.GetFollowersResponse, error)
+	GetFollowing(string, int32, int32) (*pb.GetFollowingResponse, error)
 	AddFollower(string, string) error
 	DeleteFollower(string, string) error
 }
@@ -92,7 +93,7 @@ func (s *GraphStore) AddUser(userID string) error {
 	return nil
 }
 
-func (s *GraphStore) GetFollowers(userID string) ([]*pb.GraphUser, error) {
+func (s *GraphStore) GetFollowers(userID string, page, limit int32) (*pb.GetFollowersResponse, error) {
 	exists, err := s.UserExists(userID)
 	if err != nil {
 		return nil, errtypes.NewNeo4jError("checking if user exists", err)
@@ -101,13 +102,18 @@ func (s *GraphStore) GetFollowers(userID string) ([]*pb.GraphUser, error) {
 		return nil, errtypes.NewUserNotFoundError(userID)
 	}
 
+	skip := (page - 1) * limit
+
 	ctx := context.Background()
 	query := `MATCH (:User {id: $id})<-[:FOLLOWS]-(follower)
-			RETURN follower.id`
+			RETURN follower.id
+			SKIP $skip LIMIT $limit`
 	result, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		map[string]any{
-			"id": userID,
+			"id":    userID,
+			"skip":  skip,
+			"limit": limit,
 		},
 		neo4j.EagerResultTransformer,
 		neo4j.ExecuteQueryWithDatabase("neo4j"),
@@ -128,10 +134,49 @@ func (s *GraphStore) GetFollowers(userID string) ([]*pb.GraphUser, error) {
 		}
 	}
 
-	return followers, nil
+	countQuery := `MATCH (:User {id: $id})<-[:FOLLOWS]-(follower)
+			RETURN count(follower) as count`
+	countResult, err := neo4j.ExecuteQuery(ctx, s.Driver,
+		countQuery,
+		map[string]any{
+			"id": userID,
+		},
+		neo4j.EagerResultTransformer,
+		neo4j.ExecuteQueryWithDatabase("neo4j"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	totalRecordsAny, _ := countResult.Records[0].Get("count")
+	totalRecordsInt64 := totalRecordsAny.(int64)
+	totalRecords := int32(totalRecordsInt64)
+	totalPages := totalRecords / limit
+	if (totalRecords % limit) > 0 {
+		totalPages++
+	}
+
+	var nextPage, prevPage *wrapperspb.Int32Value
+	if page < totalPages {
+		nextPage = &wrapperspb.Int32Value{Value: page + 1}
+	}
+	if page > 1 {
+		prevPage = &wrapperspb.Int32Value{Value: page - 1}
+	}
+
+	return &pb.GetFollowersResponse{
+		Data: followers,
+		Pagination: &pb.FollowerPaginationMetadata{
+			TotalRecords: totalRecords,
+			CurrentPage:  page,
+			TotalPages:   totalPages,
+			NextPage:     nextPage,
+			PrevPage:     prevPage,
+		},
+	}, nil
 }
 
-func (s *GraphStore) GetFollowing(userID string) ([]*pb.GraphUser, error) {
+func (s *GraphStore) GetFollowing(userID string, page, limit int32) (*pb.GetFollowingResponse, error) {
 	exists, err := s.UserExists(userID)
 	if err != nil {
 		return nil, errtypes.NewNeo4jError("checking if user exists", err)
@@ -140,13 +185,18 @@ func (s *GraphStore) GetFollowing(userID string) ([]*pb.GraphUser, error) {
 		return nil, errtypes.NewUserNotFoundError(userID)
 	}
 
+	skip := (page - 1) * limit
+
 	ctx := context.Background()
 	query := `MATCH (:User {id: $id})-[:FOLLOWS]->(followed)
-			RETURN followed.id`
+			RETURN followed.id
+			SKIP $skip LIMIT $limit`
 	result, err := neo4j.ExecuteQuery(ctx, s.Driver,
 		query,
 		map[string]any{
-			"id": userID,
+			"id":    userID,
+			"skip":  skip,
+			"limit": limit,
 		},
 		neo4j.EagerResultTransformer,
 		neo4j.ExecuteQueryWithDatabase("neo4j"),
@@ -167,7 +217,46 @@ func (s *GraphStore) GetFollowing(userID string) ([]*pb.GraphUser, error) {
 		}
 	}
 
-	return followings, nil
+	countQuery := `MATCH (:User {id: $id})-[:FOLLOWS]->(followed)
+			RETURN count(followed) as count`
+	countResult, err := neo4j.ExecuteQuery(ctx, s.Driver,
+		countQuery,
+		map[string]any{
+			"id": userID,
+		},
+		neo4j.EagerResultTransformer,
+		neo4j.ExecuteQueryWithDatabase("neo4j"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	totalRecordsAny, _ := countResult.Records[0].Get("count")
+	totalRecordsInt64 := totalRecordsAny.(int64)
+	totalRecords := int32(totalRecordsInt64)
+	totalPages := totalRecords / limit
+	if (totalRecords % limit) > 0 {
+		totalPages++
+	}
+
+	var nextPage, prevPage *wrapperspb.Int32Value
+	if page < totalPages {
+		nextPage = &wrapperspb.Int32Value{Value: page + 1}
+	}
+	if page > 1 {
+		prevPage = &wrapperspb.Int32Value{Value: page - 1}
+	}
+
+	return &pb.GetFollowingResponse{
+		Data: followings,
+		Pagination: &pb.FollowerPaginationMetadata{
+			TotalRecords: totalRecords,
+			CurrentPage:  page,
+			TotalPages:   totalPages,
+			NextPage:     nextPage,
+			PrevPage:     prevPage,
+		},
+	}, nil
 }
 
 func (s *GraphStore) AddFollower(followerID, followedID string) error {
