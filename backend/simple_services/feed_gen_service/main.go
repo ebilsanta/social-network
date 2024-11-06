@@ -29,20 +29,13 @@ func main() {
 		}
 	}()
 
-	postClient, postConn := api.InitPostService()
-	defer func() {
-		if err := postConn.Close(); err != nil {
-			log.Printf("Error closing PostService connection: %v", err)
-		}
-	}()
-
 	quit := make(chan struct{})
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	consumer := api.StartKafkaConsumer(os.Getenv("KAFKA_BROKER"), quit)
-	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, followerClient, postClient, consumer, quit)
+	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, followerClient, consumer, quit)
 
 	<-sigchan
 	close(quit)

@@ -11,13 +11,12 @@ import (
 )
 
 type FeedGenServiceServer struct {
-	pb.UnimplementedFeedServiceServer
 	store          storage.Storage
 	followerClient pb.FollowerServiceClient
 	consumer       *kafka.Consumer
 }
 
-func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, postClient pb.PostServiceClient, consumer *kafka.Consumer) *FeedGenServiceServer {
+func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, consumer *kafka.Consumer) *FeedGenServiceServer {
 	return &FeedGenServiceServer{
 		store:          store,
 		followerClient: followerClient,

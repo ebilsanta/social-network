@@ -53,6 +53,6 @@ message UserPaginationMetadata {
   int64 totalRecords = 1;
   int64 currentPage = 2;
   int64 totalPages = 3;
-  google.protobuf.Int64Value nextPage = 4;
-  google.protobuf.Int64Value prevPage = 5;
+  google.protobuf.Int32Value nextPage = 4;
+  google.protobuf.Int32Value prevPage = 5;
 }

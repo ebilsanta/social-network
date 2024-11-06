@@ -4,7 +4,7 @@ package feed_service;
 
 option go_package = "github.com/ebilsanta/social-network/backend/feed-service/api/proto";
 
-import "post_service.proto";
+import "google/protobuf/wrappers.proto";
 
 service FeedService {
   rpc GetFeed (GetFeedRequest) returns (GetFeedResponse) {}
@@ -12,11 +12,20 @@ service FeedService {
 
 message GetFeedRequest {
   string userId = 1;
-  int32 offset = 2;
+  int32 page = 2;
   int32 limit = 3;
 }
 
 message GetFeedResponse {
-  repeated post_service.Post posts = 1;
-  bool fromCache = 2;
+  repeated int64 data = 1;
+  FeedPaginationMetadata pagination = 2;
+}
+
+message FeedPaginationMetadata {
+  int64 totalRecords = 1;
+  int32 currentPage = 2;
+  int32 totalPages = 3;
+  google.protobuf.Int32Value nextPage = 4;
+  google.protobuf.Int32Value prevPage = 5;
+  bool fromCache = 6;
 }

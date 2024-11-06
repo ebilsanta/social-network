@@ -383,8 +383,8 @@ type UserPaginationMetadata struct {
 	TotalRecords int64                  `protobuf:"varint,1,opt,name=totalRecords,proto3" json:"totalRecords,omitempty"`
 	CurrentPage  int64                  `protobuf:"varint,2,opt,name=currentPage,proto3" json:"currentPage,omitempty"`
 	TotalPages   int64                  `protobuf:"varint,3,opt,name=totalPages,proto3" json:"totalPages,omitempty"`
-	NextPage     *wrapperspb.Int64Value `protobuf:"bytes,4,opt,name=nextPage,proto3" json:"nextPage,omitempty"`
-	PrevPage     *wrapperspb.Int64Value `protobuf:"bytes,5,opt,name=prevPage,proto3" json:"prevPage,omitempty"`
+	NextPage     *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=nextPage,proto3" json:"nextPage,omitempty"`
+	PrevPage     *wrapperspb.Int32Value `protobuf:"bytes,5,opt,name=prevPage,proto3" json:"prevPage,omitempty"`
 }
 
 func (x *UserPaginationMetadata) Reset() {
@@ -438,14 +438,14 @@ func (x *UserPaginationMetadata) GetTotalPages() int64 {
 	return 0
 }
 
-func (x *UserPaginationMetadata) GetNextPage() *wrapperspb.Int64Value {
+func (x *UserPaginationMetadata) GetNextPage() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.NextPage
 	}
 	return nil
 }
 
-func (x *UserPaginationMetadata) GetPrevPage() *wrapperspb.Int64Value {
+func (x *UserPaginationMetadata) GetPrevPage() *wrapperspb.Int32Value {
 	if x != nil {
 		return x.PrevPage
 	}
@@ -516,11 +516,11 @@ var file_user_service_proto_rawDesc = []byte{
 	0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x50, 0x61, 0x67,
 	0x65, 0x73, 0x12, 0x37, 0x0a, 0x08, 0x6e, 0x65, 0x78, 0x74, 0x50, 0x61, 0x67, 0x65, 0x18, 0x04,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49, 0x6e, 0x74, 0x36, 0x34, 0x56, 0x61, 0x6c, 0x75,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c, 0x75,
 	0x65, 0x52, 0x08, 0x6e, 0x65, 0x78, 0x74, 0x50, 0x61, 0x67, 0x65, 0x12, 0x37, 0x0a, 0x08, 0x70,
 	0x72, 0x65, 0x76, 0x50, 0x61, 0x67, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e,
 	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
-	0x49, 0x6e, 0x74, 0x36, 0x34, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x08, 0x70, 0x72, 0x65, 0x76,
+	0x49, 0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x08, 0x70, 0x72, 0x65, 0x76,
 	0x50, 0x61, 0x67, 0x65, 0x32, 0xde, 0x01, 0x0a, 0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x12, 0x3d, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x12,
 	0x1c, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47,
@@ -563,15 +563,15 @@ var file_user_service_proto_goTypes = []any{
 	(*User)(nil),                   // 4: user_service.User
 	(*UserPaginationMetadata)(nil), // 5: user_service.UserPaginationMetadata
 	(*timestamppb.Timestamp)(nil),  // 6: google.protobuf.Timestamp
-	(*wrapperspb.Int64Value)(nil),  // 7: google.protobuf.Int64Value
+	(*wrapperspb.Int32Value)(nil),  // 7: google.protobuf.Int32Value
 }
 var file_user_service_proto_depIdxs = []int32{
 	4, // 0: user_service.GetUsersResponse.data:type_name -> user_service.User
 	5, // 1: user_service.GetUsersResponse.pagination:type_name -> user_service.UserPaginationMetadata
 	6, // 2: user_service.User.createdAt:type_name -> google.protobuf.Timestamp
 	6, // 3: user_service.User.deletedAt:type_name -> google.protobuf.Timestamp
-	7, // 4: user_service.UserPaginationMetadata.nextPage:type_name -> google.protobuf.Int64Value
-	7, // 5: user_service.UserPaginationMetadata.prevPage:type_name -> google.protobuf.Int64Value
+	7, // 4: user_service.UserPaginationMetadata.nextPage:type_name -> google.protobuf.Int32Value
+	7, // 5: user_service.UserPaginationMetadata.prevPage:type_name -> google.protobuf.Int32Value
 	0, // 6: user_service.UserService.GetUser:input_type -> user_service.GetUserRequest
 	1, // 7: user_service.UserService.GetUsers:input_type -> user_service.GetUsersRequest
 	2, // 8: user_service.UserService.CreateUser:input_type -> user_service.CreateUserRequest

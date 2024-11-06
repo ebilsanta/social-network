@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func StartGRPCServer(port string, store storage.Storage, followerClient pb.FollowerServiceClient, postClient pb.PostServiceClient, consumer *kafka.Consumer, quit chan struct{}) {
+func StartGRPCServer(port string, store storage.Storage, followerClient pb.FollowerServiceClient, consumer *kafka.Consumer, quit chan struct{}) {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	log.Default().Println("Feed generation service running on port:", os.Getenv("SERVER_PORT"))
 
@@ -21,10 +21,8 @@ func StartGRPCServer(port string, store storage.Storage, followerClient pb.Follo
 	}
 
 	grpcServer := grpc.NewServer()
-	server := NewServer(store, followerClient, postClient, consumer)
+	server := NewServer(store, followerClient, consumer)
 	go server.StartPostsListener(quit)
-
-	pb.RegisterFeedServiceServer(grpcServer, server)
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {

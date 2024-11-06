@@ -20,14 +20,3 @@ func InitFollowerService() (proto.FollowerServiceClient, *grpc.ClientConn) {
 	followerClient := proto.NewFollowerServiceClient(conn)
 	return followerClient, conn
 }
-
-func InitPostService() (proto.PostServiceClient, *grpc.ClientConn) {
-	postServiceAddr := fmt.Sprintf("post_service:%s", os.Getenv("POST_SVC_PORT"))
-
-	conn, err := grpc.NewClient(postServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to connect to post service: %v", err)
-	}
-	postClient := proto.NewPostServiceClient(conn)
-	return postClient, conn
-}
