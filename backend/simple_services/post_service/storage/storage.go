@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/ebilsanta/social-network/backend/post-service/errtypes"
 	pb "github.com/ebilsanta/social-network/backend/post-service/proto/generated"
@@ -19,7 +20,7 @@ type Storage interface {
 	GetPosts() ([]*pb.Post, error)
 	GetPostById(int64) (*pb.Post, error)
 	GetPostsByPostIds([]int64) ([]*pb.Post, error)
-	GetPostsByUserId(string) ([]*pb.Post, error)
+	GetPostsByUserId(string, int32, int32) (*pb.GetPostsPaginatedResponse, error)
 	GetPostsByUserIds([]string, int32, int32) ([]*pb.Post, error)
 }
 
@@ -164,12 +165,29 @@ func (s *PostgresStore) GetPostsByPostIds(postIds []int64) ([]*pb.Post, error) {
 	return posts, nil
 }
 
-func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
-	statement := "SELECT * FROM post WHERE user_id = $1 AND deleted_at IS NULL"
-	rows, err := s.db.Query(statement, id)
+func (s *PostgresStore) GetPostsByUserId(id string, page, limit int32) (*pb.GetPostsPaginatedResponse, error) {
+	countStatement := "SELECT COUNT(*) FROM post WHERE user_id = $1 AND deleted_at IS NULL"
+	var totalRecords int32
+	err := s.db.QueryRow(countStatement, id).Scan(&totalRecords)
+	if err != nil {
+		return nil, errtypes.NewPostgresError(countStatement, err)
+	}
+
+	offset := (page - 1) * limit
+
+	statement := `
+		SELECT * FROM post 
+		WHERE user_id = $1 AND
+		deleted_at IS NULL 
+		ORDER BY created_at DESC 
+		LIMIT $2 
+		OFFSET $3`
+	rows, err := s.db.Query(statement, id, limit, offset)
 	if err != nil {
 		return nil, errtypes.NewPostgresError(statement, err)
 	}
+	defer rows.Close()
+
 	posts := []*pb.Post{}
 	for rows.Next() {
 		post, err := scanIntoPost(rows)
@@ -178,7 +196,28 @@ func (s *PostgresStore) GetPostsByUserId(id string) ([]*pb.Post, error) {
 		}
 		posts = append(posts, post)
 	}
-	return posts, nil
+
+	totalPages := (totalRecords + limit) - 1/limit
+	var nextPage, prevPage *wrapperspb.Int32Value
+	if page < totalPages {
+		next := page + 1
+		nextPage = &wrapperspb.Int32Value{Value: int32(next)}
+	}
+	if page > 1 {
+		prev := page - 1
+		prevPage = &wrapperspb.Int32Value{Value: int32(prev)}
+	}
+
+	return &pb.GetPostsPaginatedResponse{
+		Data: posts,
+		Pagination: &pb.PostPaginationMetadata{
+			TotalRecords: totalRecords,
+			CurrentPage:  page,
+			TotalPages:   totalPages,
+			NextPage:     nextPage,
+			PrevPage:     prevPage,
+		},
+	}, nil
 }
 
 func (s *PostgresStore) GetPostsByUserIds(userIds []string, offset, limit int32) ([]*pb.Post, error) {

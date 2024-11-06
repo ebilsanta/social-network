@@ -35,7 +35,7 @@ type PostServiceClient interface {
 	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*Post, error)
 	GetPosts(ctx context.Context, in *GetPostsRequest, opts ...grpc.CallOption) (*GetPostsResponse, error)
 	GetPostsByPostIds(ctx context.Context, in *GetPostsByIdsRequest, opts ...grpc.CallOption) (*GetPostsResponse, error)
-	GetPostsByUserId(ctx context.Context, in *GetPostsByUserRequest, opts ...grpc.CallOption) (*GetPostsResponse, error)
+	GetPostsByUserId(ctx context.Context, in *GetPostsByUserRequest, opts ...grpc.CallOption) (*GetPostsPaginatedResponse, error)
 	GetPostsByUserIds(ctx context.Context, in *GetPostsByUsersRequest, opts ...grpc.CallOption) (*GetPostsResponse, error)
 }
 
@@ -87,9 +87,9 @@ func (c *postServiceClient) GetPostsByPostIds(ctx context.Context, in *GetPostsB
 	return out, nil
 }
 
-func (c *postServiceClient) GetPostsByUserId(ctx context.Context, in *GetPostsByUserRequest, opts ...grpc.CallOption) (*GetPostsResponse, error) {
+func (c *postServiceClient) GetPostsByUserId(ctx context.Context, in *GetPostsByUserRequest, opts ...grpc.CallOption) (*GetPostsPaginatedResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPostsResponse)
+	out := new(GetPostsPaginatedResponse)
 	err := c.cc.Invoke(ctx, PostService_GetPostsByUserId_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ type PostServiceServer interface {
 	GetPost(context.Context, *GetPostRequest) (*Post, error)
 	GetPosts(context.Context, *GetPostsRequest) (*GetPostsResponse, error)
 	GetPostsByPostIds(context.Context, *GetPostsByIdsRequest) (*GetPostsResponse, error)
-	GetPostsByUserId(context.Context, *GetPostsByUserRequest) (*GetPostsResponse, error)
+	GetPostsByUserId(context.Context, *GetPostsByUserRequest) (*GetPostsPaginatedResponse, error)
 	GetPostsByUserIds(context.Context, *GetPostsByUsersRequest) (*GetPostsResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
@@ -139,7 +139,7 @@ func (UnimplementedPostServiceServer) GetPosts(context.Context, *GetPostsRequest
 func (UnimplementedPostServiceServer) GetPostsByPostIds(context.Context, *GetPostsByIdsRequest) (*GetPostsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPostsByPostIds not implemented")
 }
-func (UnimplementedPostServiceServer) GetPostsByUserId(context.Context, *GetPostsByUserRequest) (*GetPostsResponse, error) {
+func (UnimplementedPostServiceServer) GetPostsByUserId(context.Context, *GetPostsByUserRequest) (*GetPostsPaginatedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPostsByUserId not implemented")
 }
 func (UnimplementedPostServiceServer) GetPostsByUserIds(context.Context, *GetPostsByUsersRequest) (*GetPostsResponse, error) {

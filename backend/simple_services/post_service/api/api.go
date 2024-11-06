@@ -73,13 +73,13 @@ func (s *PostServiceServer) GetPostsByPostIds(ctx context.Context, req *pb.GetPo
 	return &pb.GetPostsResponse{Posts: posts}, nil
 }
 
-func (s *PostServiceServer) GetPostsByUserId(ctx context.Context, req *pb.GetPostsByUserRequest) (*pb.GetPostsResponse, error) {
+func (s *PostServiceServer) GetPostsByUserId(ctx context.Context, req *pb.GetPostsByUserRequest) (*pb.GetPostsPaginatedResponse, error) {
 	log.Default().Printf("post_service GetPostsByUserId request: %v", req)
-	posts, err := s.store.GetPostsByUserId(req.Id)
+	posts, err := s.store.GetPostsByUserId(req.Id, req.Page, req.Limit)
 	if err != nil {
 		return nil, HandleError(err)
 	}
-	return &pb.GetPostsResponse{Posts: posts}, nil
+	return posts, nil
 }
 
 func (s *PostServiceServer) GetPostsByUserIds(ctx context.Context, req *pb.GetPostsByUsersRequest) (*pb.GetPostsResponse, error) {
