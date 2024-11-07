@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package post_service;
 
-option go_package = "github.com/ebilsanta/social-network/backend/feed-service/api/proto";
+option go_package = "github.com/ebilsanta/social-network/backend/complex_services/post_service/proto";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";

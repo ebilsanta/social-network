@@ -29,7 +29,7 @@ func NewServer(store storage.Storage, producer *KafkaProducer) *PostServiceServe
 
 func (s *PostServiceServer) CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*pb.Post, error) {
 	log.Default().Printf("post_service CreatePost request: %v", req)
-	post := types.NewPost(req.Caption, req.ImageURL, req.UserId)
+	post := types.NewPost(req.Caption, req.Image, req.UserId)
 	dbPost, err := s.store.CreatePost(post)
 
 	if err != nil {

@@ -25,7 +25,7 @@ func NewUserController(client pb.UserServiceClient) *UserController {
 func (uc *UserController) CreateUser(ctx *gin.Context) {
 	var user models.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"details": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "could not parse body", "details": err.Error()})
 		return
 	}
 
@@ -75,7 +75,7 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 	}
 
 	users, err := uc.client.GetUsers(ctx, &pb.GetUsersRequest{
-		Query: ctx.Query("query"),
+		Query: params.Query,
 		Page:  params.Page,
 		Limit: params.Limit,
 	})
@@ -103,7 +103,7 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user", "details": err.Error()})
 		return
 	}
-	
+
 	ctx.JSON(http.StatusOK, &models.GetUserResponse{
 		Data: mapUser(user, true),
 	})

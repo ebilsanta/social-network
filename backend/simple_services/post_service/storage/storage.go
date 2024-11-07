@@ -59,7 +59,7 @@ func (s *PostgresStore) CreatePostTable() error {
 	query := `CREATE TABLE if not exists post (
 		id serial primary key,
 		caption varchar(2000),
-		image_url varchar(2000),
+		image varchar(2000),
 		user_id varchar(255),
 		created_at timestamp,
 		deleted_at timestamp
@@ -70,7 +70,7 @@ func (s *PostgresStore) CreatePostTable() error {
 
 func (s *PostgresStore) CreatePost(post *pb.Post) (*pb.Post, error) {
 	statement := `
-		INSERT INTO post (caption, image_url, user_id, created_at)
+		INSERT INTO post (caption, image, user_id, created_at)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
@@ -78,7 +78,7 @@ func (s *PostgresStore) CreatePost(post *pb.Post) (*pb.Post, error) {
 	err := s.db.QueryRow(
 		statement,
 		post.Caption,
-		post.ImageURL,
+		post.Image,
 		post.UserId,
 		post.CreatedAt.AsTime(),
 	).Scan(&post.Id)
@@ -279,7 +279,7 @@ func scanIntoPost(rows *sql.Rows) (*pb.Post, error) {
 	err := rows.Scan(
 		&post.Id,
 		&post.Caption,
-		&post.ImageURL,
+		&post.Image,
 		&post.UserId,
 		&createdAt,
 		&deletedAt,

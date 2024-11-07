@@ -18,14 +18,14 @@ service PostService {
 
 message CreatePostRequest {
   string caption = 1;
-  string imageURL = 2;
+  string image = 2;
   string userId = 3;
 }
 
 message Post {
   int64 id = 1;
   string caption = 2;
-  string imageURL = 3;
+  string image = 3;
   string userId = 4;
   google.protobuf.Timestamp createdAt = 5;
   google.protobuf.Timestamp deletedAt = 6;
