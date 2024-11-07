@@ -74,22 +74,40 @@ func (s *UserServiceServer) StartUsersListener(quit chan struct{}) {
 					switch *ev.TopicPartition.Topic {
 					case "new-post.update-profile":
 						userId, postId := key, val
-						log.Default().Printf("Update profile new post: userId: %s, postId: %s\n", userId, postId)
-						s.store.UpdatePostCount(userId, 1)
-						return
+						s.handleNewPosts(userId, postId)
 					case "new-follower.update-profile":
 						followerId, followingId := key, val
-						log.Default().Printf("Update profile new follower: followerId: %s, followingId: %s\n", followerId, followingId)
-						s.store.UpdateFollowerFollowingCount(followerId, followingId, 1)
-						return
+						s.handleNewFollower(followerId, followingId)
 					case "delete-follower.update-profile":
 						followerId, followingId := key, val
-						log.Default().Printf("Update profile delete follower: followerId: %s, followingId: %s\n", followerId, followingId)
-						s.store.UpdateFollowerFollowingCount(followerId, followingId, -1)
-						return
+						s.handleDeleteFollower(followerId, followingId)
 					}
 				}
 			}
 		}
 	}()
+}
+
+func (s *UserServiceServer) handleNewPosts(userId string, postId string) {
+	log.Default().Printf("Update profile new post: userId: %s, postId: %s\n", userId, postId)
+	err := s.store.UpdatePostCount(userId, 1)
+	if err != nil {
+		log.Default().Printf("Error updating post count: %v\n", err)
+	}
+}
+
+func (s *UserServiceServer) handleNewFollower(followerId string, followingId string) {
+	log.Default().Printf("Update profile new follower: followerId: %s, followingId: %s\n", followerId, followingId)
+	err := s.store.UpdateFollowerFollowingCount(followerId, followingId, 1)
+	if err != nil {
+		log.Default().Printf("Error updating follower/following count: %v\n", err)
+	}
+}
+
+func (s *UserServiceServer) handleDeleteFollower(followerId string, followingId string) {
+	log.Default().Printf("Update profile delete follower: followerId: %s, followingId: %s\n", followerId, followingId)
+	err := s.store.UpdateFollowerFollowingCount(followerId, followingId, -1)
+	if err != nil {
+		log.Default().Printf("Error updating follower/following count: %v\n", err)
+	}
 }
