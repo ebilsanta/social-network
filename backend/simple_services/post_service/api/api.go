@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"strconv"
 
 	"github.com/ebilsanta/social-network/backend/post-service/errtypes"
 	pb "github.com/ebilsanta/social-network/backend/post-service/proto/generated"
@@ -36,12 +35,12 @@ func (s *PostServiceServer) CreatePost(ctx context.Context, req *pb.CreatePostRe
 		return nil, HandleError(err)
 	}
 
-	key := []byte(req.UserId)
-	value := []byte(strconv.FormatInt(dbPost.Id, 10))
+	// key := []byte(req.UserId)
+	// value := []byte(strconv.FormatInt(dbPost.Id, 10))
 
-	s.producer.Produce("new-post.notification", key, value)
-	s.producer.Produce("new-post.update-feed", key, value)
-	s.producer.Produce("new-post.update-profile", key, value)
+	// s.producer.Produce("new-post.notification", key, value)
+	// s.producer.Produce("new-post.update-feed", key, value)
+	// s.producer.Produce("new-post.update-profile", key, value)
 
 	return dbPost, nil
 }

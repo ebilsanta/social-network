@@ -5,6 +5,7 @@ go 1.21.0
 toolchain go1.21.4
 
 require (
+	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/gin-gonic/gin v1.10.0
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.1

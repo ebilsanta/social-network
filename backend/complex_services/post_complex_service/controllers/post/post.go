@@ -2,20 +2,24 @@ package post
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ebilsanta/social-network/backend/complex_services/post_service/models"
+	"github.com/ebilsanta/social-network/backend/complex_services/post_service/services"
 	pb "github.com/ebilsanta/social-network/backend/complex_services/post_service/services/proto/generated"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type PostController struct {
-	client pb.PostServiceClient
+	client   pb.PostServiceClient
+	producer *services.KafkaProducer
 }
 
-func NewPostController(client pb.PostServiceClient) *PostController {
+func NewPostController(client pb.PostServiceClient, producer *services.KafkaProducer) *PostController {
 	return &PostController{
-		client: client,
+		client:   client,
+		producer: producer,
 	}
 }
 
@@ -36,6 +40,13 @@ func (pc *PostController) CreatePost(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create post", "details": err.Error()})
 		return
 	}
+
+	key := []byte(post.UserId)
+	value := []byte(strconv.FormatInt(createdPost.Id, 10))
+
+	pc.producer.Produce("new-post.notification", key, value)
+	pc.producer.Produce("new-post.update-feed", key, value)
+	pc.producer.Produce("new-post.update-profile", key, value)
 
 	resp := &models.CreatePostResponse{
 		Data: createdPost,
