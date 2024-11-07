@@ -17,6 +17,6 @@ func InitPostService() (proto.PostServiceClient, *grpc.ClientConn) {
 	if err != nil {
 		log.Fatalf("failed to connect to post service: %v", err)
 	}
-	userClient := proto.NewPostServiceClient(conn)
-	return userClient, conn
+	postClient := proto.NewPostServiceClient(conn)
+	return postClient, conn
 }

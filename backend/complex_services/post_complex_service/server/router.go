@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/ebilsanta/social-network/backend/complex_services/post_service/controllers"
-	user "github.com/ebilsanta/social-network/backend/complex_services/post_service/controllers/post"
+	post "github.com/ebilsanta/social-network/backend/complex_services/post_service/controllers/post"
 	pb "github.com/ebilsanta/social-network/backend/complex_services/post_service/services/proto/generated"
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +12,7 @@ func NewRouter(postClient pb.PostServiceClient) *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	postController := user.NewPostController(postClient)
+	postController := post.NewPostController(postClient)
 
 	health := new(controllers.HealthController)
 
