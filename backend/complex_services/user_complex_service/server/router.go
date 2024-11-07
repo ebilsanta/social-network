@@ -22,7 +22,9 @@ func NewRouter(userClient pb.UserServiceClient) *gin.Engine {
 	{
 		usersGroup := v1.Group("users")
 		{
+			usersGroup.GET("/", userController.GetUsers)
 			usersGroup.POST("/", userController.CreateUser)
+			usersGroup.GET("/:id", userController.GetUser)
 		}
 	}
 	return router

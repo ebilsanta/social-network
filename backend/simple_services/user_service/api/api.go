@@ -28,13 +28,12 @@ func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, c
 
 func (s *UserServiceServer) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
 	user := types.NewUser(req.Id, req.Email, req.Name, req.Username, req.Image)
-	log.Default().Printf("user_service CreateUser request: %v", user)
 	dbUser, err := s.store.CreateUser(user)
 
 	if err != nil {
 		return nil, err
 	}
-	log.Default().Printf("user_service CreateUser response: %v", dbUser)
+
 	_, err = s.followerClient.AddUser(ctx, &pb.AddUserRequest{Id: dbUser.Id})
 	if err != nil {
 		s.store.DeleteUser(dbUser.Id)

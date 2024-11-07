@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
@@ -78,6 +80,9 @@ func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
 	_, err := s.collection.InsertOne(context.TODO(), user)
 
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, status.Errorf(codes.AlreadyExists, "a user with this id or username already exists")
+		}
 		return nil, err
 	}
 
@@ -154,7 +159,12 @@ func (s *MongoStore) GetUsers(query string, page, limit int64) (*pb.GetUsersResp
 
 func (s *MongoStore) GetUser(id string) (*pb.User, error) {
 	var user types.User
-	if err := s.collection.FindOne(context.TODO(), primitive.M{"id": id}).Decode(&user); err != nil {
+	err := s.collection.FindOne(context.TODO(), primitive.M{"id": id}).Decode(&user)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, status.Errorf(codes.NotFound, "user with id %s not found", id)
+		}
 		return nil, err
 	}
 
