@@ -39,10 +39,14 @@ func NewMongoStore() (*MongoStore, error) {
 	collection := client.Database("user").Collection("user")
 
 	// Enable text searches on username field
-	usernameIndex := mongo.IndexModel{Keys: bson.D{{Key: "username", Value: "text"}}}
+	usernameIndex := mongo.IndexModel{
+		Keys:    bson.D{{Key: "username", Value: "text"}},
+		Options: options.Index().SetUnique(true),
+	}
 
 	idIndex := mongo.IndexModel{
-		Keys: bson.D{{Key: "id", Value: 1}},
+		Keys:    bson.D{{Key: "id", Value: 1}},
+		Options: options.Index().SetUnique(true),
 	}
 
 	_, err = collection.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{usernameIndex, idIndex})

@@ -1,9 +1,11 @@
 import { Anchor, Text, Title } from '@mantine/core';
 import classes from './welcome.module.css';
+import LoginButton from './login-button';
 
 export function Welcome() {
   return (
     <>
+      <LoginButton />
       <Title className={classes.title} ta="center" mt={100}>
         Welcome to{' '}
         <Text inherit variant="gradient" component="span" gradient={{ from: 'pink', to: 'yellow' }}>
