@@ -43,7 +43,7 @@ services:
     ports:
       - "1234:5432"
     volumes:
-      - ./simple_services/post_service/post_svc_data:/var/lib/postgresql/data
+      - post_svc_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "${POST_SVC_DB_NAME}"]
       interval: 30s
@@ -83,7 +83,7 @@ services:
       - "7474:7474"
       - "7687:7687"
     volumes:
-      - ./simple_services/follower_service/follower_db:/data
+      - follower_svc_data:/var/lib/neo4j/data
     networks:
       - social_network
 
@@ -116,7 +116,7 @@ services:
     restart:
       always
     volumes:
-      - ./simple_services/user_service/user_db:/data
+      - user_svc_data:/data/db
     ports:
       - "12345:27017"
     networks:
@@ -149,7 +149,7 @@ services:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass ${FEED_DB_PASSWORD}
     volumes: 
-      - ./simple_services/feed_service/feed_db:/data
+      - feed_svc_data:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     networks:
@@ -451,9 +451,9 @@ secrets:
 
 volumes:
   post_svc_data:
-  follower_db:
-  user_db:
-  feed_db:
+  follower_svc_data:
+  user_svc_data:
+  feed_svc_data:
     driver: local
   kong_data: {}
   kong_prefix_vol:
