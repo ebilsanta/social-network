@@ -53,7 +53,7 @@ func (s *PostServiceServer) GetPosts(ctx context.Context, req *pb.GetPostsReques
 	if err != nil {
 		return nil, HandleError(err)
 	}
-	return &pb.GetPostsResponse{Posts: posts}, nil
+	return &pb.GetPostsResponse{Data: posts}, nil
 }
 
 func (s *PostServiceServer) GetPostsByPostIds(ctx context.Context, req *pb.GetPostsByIdsRequest) (*pb.GetPostsResponse, error) {
@@ -62,7 +62,7 @@ func (s *PostServiceServer) GetPostsByPostIds(ctx context.Context, req *pb.GetPo
 	if err != nil {
 		return nil, HandleError(err)
 	}
-	return &pb.GetPostsResponse{Posts: posts}, nil
+	return &pb.GetPostsResponse{Data: posts}, nil
 }
 
 func (s *PostServiceServer) GetPostsByUserId(ctx context.Context, req *pb.GetPostsByUserRequest) (*pb.GetPostsPaginatedResponse, error) {
@@ -80,7 +80,7 @@ func (s *PostServiceServer) GetPostsByUserIds(ctx context.Context, req *pb.GetPo
 	if err != nil {
 		return nil, HandleError(err)
 	}
-	return &pb.GetPostsResponse{Posts: posts}, nil
+	return &pb.GetPostsResponse{Data: posts}, nil
 }
 
 func HandleError(err error) error {

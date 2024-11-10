@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package post_service;
 
-option go_package = "github.com/ebilsanta/social-network/backend/post_service/proto";
+option go_package = "github.com/ebilsanta/social-network/backend/complex_services/feed_complex_service/services/proto";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
@@ -38,7 +38,7 @@ message GetPostRequest {
 message GetPostsRequest {}
 
 message GetPostsResponse {
-  repeated Post data = 1;
+  repeated Post posts = 1;
 }
 
 message GetPostsByIdsRequest {

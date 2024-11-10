@@ -1,7 +1,6 @@
 package followers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/ebilsanta/social-network/backend/complex_services/follower_complex_service/models"
@@ -52,7 +51,6 @@ func (c *FollowerController) GetFollowers(ctx *gin.Context) {
 		})
 		return
 	}
-	log.Printf("followerIds: %v", followerIds.Data)
 
 	followers, err := c.userClient.GetUsersByIds(ctx, &pb.GetUsersByIdsRequest{
 		Ids: followerIds.Data,
@@ -62,7 +60,6 @@ func (c *FollowerController) GetFollowers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get followers", "details": err.Error()})
 		return
 	}
-	log.Printf("followers: %v", followers.Data)
 
 	ctx.JSON(http.StatusOK, &models.GetResponse{
 		Data:       followers.Data,

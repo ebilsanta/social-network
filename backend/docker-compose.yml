@@ -229,6 +229,27 @@ services:
       - ./complex_services/follower_complex_service:/app
     depends_on:
       - follower_service
+      - user_service
+    networks:
+      - social_network
+  
+  feed_complex_service:
+    container_name: feed_complex_service
+    environment:
+      - SERVER_PORT=${FEED_COMPLEX_SVC_PORT}
+      - FEED_SVC_PORT=${FEED_SVC_PORT}
+      - POST_SVC_PORT=${POST_SVC_PORT}
+      - KAFKA_BROKER=${KAFKA_BROKER}
+    tty: true
+    build: ./complex_services/feed_complex_service
+    ports:
+      - "${FEED_COMPLEX_SVC_PORT}:${FEED_COMPLEX_SVC_PORT}"
+    restart: on-failure
+    volumes:
+      - ./complex_services/feed_complex_service:/app
+    depends_on:
+      - feed_service
+      - post_service
     networks:
       - social_network
 
