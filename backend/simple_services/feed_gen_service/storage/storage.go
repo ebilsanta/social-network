@@ -17,6 +17,8 @@ type RedisStore struct {
 	Client *redis.Client
 }
 
+const MAXFEEDSIZE = 100
+
 func NewRedisStore() (*RedisStore, error) {
 	client, err := connectToDB()
 	if err != nil {
@@ -45,6 +47,7 @@ func (s *RedisStore) AddToFeeds(users []string, postID string) error {
 			Score:  score,
 			Member: postID,
 		})
+		pipe.ZRemRangeByRank(ctx, key, 0, int64(-MAXFEEDSIZE-1))
 	}
 	_, err := pipe.Exec(ctx)
 	return err
