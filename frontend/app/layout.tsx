@@ -21,9 +21,18 @@ export default function RootLayout({ children }: { children: any }) {
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
         />
       </head>
-      <body>
+      <body
+        style={{
+          margin: 0,
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
         <SessionProvider>
-          <MantineProvider theme={theme} defaultColorScheme="auto">{children}</MantineProvider>
+          <MantineProvider theme={theme} defaultColorScheme="auto">
+            <div style={{ width: '100%' }}>{children}</div>
+          </MantineProvider>
         </SessionProvider>
       </body>
     </html>
