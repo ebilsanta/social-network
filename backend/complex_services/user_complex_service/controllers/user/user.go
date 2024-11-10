@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ebilsanta/social-network/backend/complex_services/user_service/models"
+	"github.com/ebilsanta/social-network/backend/complex_services/user_service/services"
 	pb "github.com/ebilsanta/social-network/backend/complex_services/user_service/services/proto/generated"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
@@ -13,12 +14,14 @@ import (
 )
 
 type UserController struct {
-	client pb.UserServiceClient
+	client   pb.UserServiceClient
+	producer *services.KafkaProducer
 }
 
-func NewUserController(client pb.UserServiceClient) *UserController {
+func NewUserController(client pb.UserServiceClient, producer *services.KafkaProducer) *UserController {
 	return &UserController{
-		client: client,
+		client:   client,
+		producer: producer,
 	}
 }
 
@@ -42,13 +45,16 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 		if grpcStatus == codes.AlreadyExists {
 			ctx.JSON(http.StatusConflict, gin.H{
 				"error":   "failed to create user",
-				"details": err.Error(),
+				"details": "user with this email or username already exists",
 			})
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user", "details": err.Error()})
 		return
 	}
+
+	key := []byte(createdUser.Id)
+	uc.producer.Produce("new-user.add-graph-user", key, []byte(""))
 
 	resp := &models.CreateUserResponse{
 		Data: &models.User{

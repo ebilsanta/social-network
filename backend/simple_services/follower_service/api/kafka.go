@@ -6,11 +6,23 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type KafkaProducer struct {
+type KafkaClient struct {
 	producer *kafka.Producer
+	consumer *kafka.Consumer
 }
 
-func StartKafkaProducer(broker string, quit chan struct{}) *KafkaProducer {
+func InitKafka(broker string, quit chan struct{}) *KafkaClient {
+	p := startKafkaProducer(broker)
+	c := startKafkaConsumer(broker)
+	k := &KafkaClient{
+		producer: p,
+		consumer: c,
+	}
+
+	return k
+}
+
+func startKafkaProducer(broker string) *kafka.Producer {
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers":  broker,
 		"acks":               "all",
@@ -23,40 +35,33 @@ func StartKafkaProducer(broker string, quit chan struct{}) *KafkaProducer {
 
 	log.Default().Printf("Follower service connected to Kafka broker at %s\n", broker)
 
-	kp := &KafkaProducer{
-		producer: p,
-	}
-
-	go kp.listenEvents(quit)
-
-	return kp
+	return p
 }
 
-func (kp *KafkaProducer) Produce(topic string, key []byte, value []byte) {
-	kp.producer.Produce(&kafka.Message{
+func startKafkaConsumer(broker string) *kafka.Consumer {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":    broker,
+		"group.id":             "follower-service",
+		"max.poll.interval.ms": 60000,
+	})
+
+	if err != nil {
+		log.Fatalf("Failed to create consumer: %s\n", err)
+	}
+	topics := []string{"new-user.add-graph-user"}
+	err = c.SubscribeTopics(topics, nil)
+	if err != nil {
+		log.Fatalf("Failed to subscribe to topic: %s\n", err)
+	}
+	log.Default().Printf("Follower service connected to Kafka broker %s and subscribed to topics %v\n", broker, topics)
+
+	return c
+}
+
+func (k *KafkaClient) Produce(topic string, key []byte, value []byte) {
+	k.producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Key:            key,
 		Value:          value,
 	}, nil)
-}
-
-func (kp *KafkaProducer) listenEvents(quit chan struct{}) {
-	for {
-		select {
-		case <-quit:
-			kp.producer.Close()
-			log.Default().Println("Producer closed.")
-			return
-		case e := <-kp.producer.Events():
-			switch ev := e.(type) {
-			case *kafka.Message:
-				if ev.TopicPartition.Error != nil {
-					log.Printf("Failed to deliver message: %v\n", ev.TopicPartition)
-				} else {
-					log.Printf("Produced event to topic %s: key = %-10s value = %s\n",
-						*ev.TopicPartition.Topic, string(ev.Key), string(ev.Value))
-				}
-			}
-		}
-	}
 }

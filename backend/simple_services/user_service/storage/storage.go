@@ -22,6 +22,7 @@ import (
 type Storage interface {
 	CreateUser(*types.User) (*pb.User, error)
 	GetUsers(string, int64, int64) (*pb.GetUsersResponse, error)
+	GetUsersByIds([]string) (*pb.GetUsersByIdsResponse, error)
 	GetUser(string) (*pb.User, error)
 	DeleteUser(string) error
 	UpdatePostCount(string, int32) error
@@ -169,6 +170,35 @@ func (s *MongoStore) GetUser(id string) (*pb.User, error) {
 	}
 
 	return decodeUser(user), nil
+}
+
+func (s *MongoStore) GetUsersByIds(ids []string) (*pb.GetUsersByIdsResponse, error) {
+	filter := bson.M{"id": bson.M{"$in": ids}}
+	log.Printf("ids: %v", ids)
+
+	cursor, err := s.collection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	var users []*pb.User
+	for cursor.Next(context.TODO()) {
+		var user types.User
+		if err := cursor.Decode(&user); err != nil {
+			return nil, err
+		}
+		users = append(users, decodeUser(user))
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	log.Printf("users: %v", users)
+
+	return &pb.GetUsersByIdsResponse{
+		Data: users,
+	}, nil
 }
 
 func (s *MongoStore) DeleteUser(id string) error {

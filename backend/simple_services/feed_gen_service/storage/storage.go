@@ -6,12 +6,11 @@ import (
 	"os"
 	"time"
 
-	pb "github.com/ebilsanta/social-network/backend/feed-gen-service/api/proto/generated"
 	"github.com/redis/go-redis/v9"
 )
 
 type Storage interface {
-	AddToFeeds([]*pb.GraphUser, string) error
+	AddToFeeds([]string, string) error
 }
 
 type RedisStore struct {
@@ -35,12 +34,12 @@ func connectToDB() (*redis.Client, error) {
 	return redis.NewClient(opt), nil
 }
 
-func (s *RedisStore) AddToFeeds(users []*pb.GraphUser, postID string) error {
+func (s *RedisStore) AddToFeeds(users []string, postID string) error {
 	pipe := s.Client.Pipeline()
 	ctx := context.Background()
 
 	for _, user := range users {
-		key := fmt.Sprintf("feed:%s", user.Id)
+		key := fmt.Sprintf("feed:%s", user)
 		score := float64(time.Now().Unix())
 		pipe.ZAdd(ctx, key, redis.Z{
 			Score:  score,

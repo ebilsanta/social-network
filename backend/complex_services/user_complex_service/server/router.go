@@ -3,16 +3,17 @@ package server
 import (
 	"github.com/ebilsanta/social-network/backend/complex_services/user_service/controllers"
 	"github.com/ebilsanta/social-network/backend/complex_services/user_service/controllers/user"
+	"github.com/ebilsanta/social-network/backend/complex_services/user_service/services"
 	pb "github.com/ebilsanta/social-network/backend/complex_services/user_service/services/proto/generated"
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(userClient pb.UserServiceClient) *gin.Engine {
+func NewRouter(userClient pb.UserServiceClient, producer *services.KafkaProducer) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	userController := user.NewUserController(userClient)
+	userController := user.NewUserController(userClient, producer)
 
 	health := new(controllers.HealthController)
 

@@ -212,6 +212,25 @@ services:
       - post_service
     networks:
       - social_network
+    
+  follower_complex_service:
+    container_name: follower_complex_service
+    environment:
+      - SERVER_PORT=${FOLLOWER_COMPLEX_SVC_PORT}
+      - FOLLOWER_SVC_PORT=${FOLLOWER_SVC_PORT}
+      - USER_SVC_PORT=${USER_SVC_PORT}
+      - KAFKA_BROKER=${KAFKA_BROKER}
+    tty: true
+    build: ./complex_services/follower_complex_service
+    ports:
+      - "${FOLLOWER_COMPLEX_SVC_PORT}:${FOLLOWER_COMPLEX_SVC_PORT}"
+    restart: on-failure
+    volumes:
+      - ./complex_services/follower_complex_service:/app
+    depends_on:
+      - follower_service
+    networks:
+      - social_network
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

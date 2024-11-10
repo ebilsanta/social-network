@@ -1,4 +1,4 @@
-module github.com/ebilsanta/social-network/backend/complex_services/user_service
+module github.com/ebilsanta/social-network/backend/complex_services/follower_complex_service
 
 go 1.21.0
 

@@ -34,12 +34,6 @@ func (s *UserServiceServer) CreateUser(ctx context.Context, req *pb.CreateUserRe
 		return nil, err
 	}
 
-	_, err = s.followerClient.AddUser(ctx, &pb.AddUserRequest{Id: dbUser.Id})
-	if err != nil {
-		s.store.DeleteUser(dbUser.Id)
-		return nil, err
-	}
-
 	return dbUser, nil
 }
 
@@ -59,33 +53,39 @@ func (s *UserServiceServer) GetUsers(ctx context.Context, req *pb.GetUsersReques
 	return res, nil
 }
 
+func (s *UserServiceServer) GetUsersByIds(ctx context.Context, req *pb.GetUsersByIdsRequest) (*pb.GetUsersByIdsResponse, error) {
+	res, err := s.store.GetUsersByIds(req.Ids)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (s *UserServiceServer) StartUsersListener(quit chan struct{}) {
-	go func() {
-		for {
-			select {
-			case <-quit:
-				s.consumer.Close()
-				log.Println("Kafka consumer closed.")
-				return
-			default:
-				ev, err := s.consumer.ReadMessage(100 * time.Millisecond)
-				if err == nil {
-					key, val := string(ev.Key), string(ev.Value)
-					switch *ev.TopicPartition.Topic {
-					case "new-post.update-profile":
-						userId, postId := key, val
-						s.handleNewPosts(userId, postId)
-					case "new-follower.update-profile":
-						followerId, followingId := key, val
-						s.handleNewFollower(followerId, followingId)
-					case "delete-follower.update-profile":
-						followerId, followingId := key, val
-						s.handleDeleteFollower(followerId, followingId)
-					}
+	for {
+		select {
+		case <-quit:
+			s.consumer.Close()
+			log.Println("Kafka consumer closed.")
+			return
+		default:
+			ev, err := s.consumer.ReadMessage(100 * time.Millisecond)
+			if err == nil {
+				key, val := string(ev.Key), string(ev.Value)
+				switch *ev.TopicPartition.Topic {
+				case "new-post.update-profile":
+					userId, postId := key, val
+					s.handleNewPosts(userId, postId)
+				case "new-follower.update-profile":
+					followerId, followingId := key, val
+					s.handleNewFollower(followerId, followingId)
+				case "delete-follower.update-profile":
+					followerId, followingId := key, val
+					s.handleDeleteFollower(followerId, followingId)
 				}
 			}
 		}
-	}()
+	}
 }
 
 func (s *UserServiceServer) handleNewPosts(userId string, postId string) {

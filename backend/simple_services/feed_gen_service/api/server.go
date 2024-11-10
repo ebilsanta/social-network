@@ -22,7 +22,7 @@ func StartGRPCServer(port string, store storage.Storage, followerClient pb.Follo
 
 	grpcServer := grpc.NewServer()
 	server := NewServer(store, followerClient, consumer)
-	go server.StartPostsListener(quit)
+	go server.StartFeedListener(quit)
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {

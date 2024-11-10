@@ -25,8 +25,8 @@ func main() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
-	producer := api.StartKafkaProducer(os.Getenv("KAFKA_BROKER"), quit)
-	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, producer, quit)
+	kafkaClient := api.InitKafka(os.Getenv("KAFKA_BROKER"), quit)
+	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, kafkaClient, quit)
 
 	<-sigchan
 	close(quit)

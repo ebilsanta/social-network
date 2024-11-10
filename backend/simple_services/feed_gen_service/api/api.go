@@ -24,7 +24,7 @@ func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, c
 	}
 }
 
-func (s *FeedGenServiceServer) StartPostsListener(quit chan struct{}) {
+func (s *FeedGenServiceServer) StartFeedListener(quit chan struct{}) {
 	go func() {
 		for {
 			select {
@@ -48,14 +48,31 @@ func (s *FeedGenServiceServer) StartPostsListener(quit chan struct{}) {
 }
 
 func (s *FeedGenServiceServer) updateFeeds(posterId, postId string) {
-	followers, err := s.followerClient.GetFollowers(context.Background(), &pb.GetFollowersRequest{Id: posterId})
-	if err != nil {
-		log.Printf("Failed to get followers for user %s: %v\n", posterId, err)
-		return
-	}
-	log.Printf("Adding post %s to feeds of %v followers\n", postId, followers.Followers)
-	err = s.store.AddToFeeds(followers.Followers, postId)
-	if err != nil {
-		log.Printf("Failed to add post %s to feeds: %v\n", postId, err)
+	page := int32(1)
+	limit := int32(100)
+
+	for {
+		followers, err := s.followerClient.GetFollowers(context.Background(), &pb.GetFollowersRequest{
+			Id:    posterId,
+			Page:  page,
+			Limit: limit,
+		})
+		if err != nil {
+			log.Printf("Failed to get followers for user %s on page %d: %v\n", posterId, page, err)
+			return
+		}
+
+		if len(followers.Data) > 0 {
+			err = s.store.AddToFeeds(followers.Data, postId)
+			if err != nil {
+				log.Printf("Failed to add post %s to feeds: %v\n", postId, err)
+			}
+		}
+
+		if followers.Pagination.NextPage == nil {
+			break
+		}
+
+		page = followers.Pagination.NextPage.GetValue()
 	}
 }
