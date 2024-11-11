@@ -18,7 +18,7 @@ func NewRouter(feedClient pb.FeedServiceClient, postClient pb.PostServiceClient)
 
 	router.GET("/health", health.Status)
 
-	v1 := router.Group("v1")
+	v1 := router.Group("api/v1")
 	{
 		feedGroup := v1.Group("feeds")
 		{

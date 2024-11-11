@@ -3,190 +3,133 @@ _format_version: "3.0"
 _transform: true
 
 services:
-- name: post_service
-  protocol: grpc
-  host: post_service
-  port: 8081
-  routes:
-  - name: get-post-route
-    protocols:
-    - http
-    paths:
-    - /v1/posts/(?<id>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/post_service.proto
+  - name: user_service
+    protocol: http
+    host: user_complex_service
+    port: 8086
+    path: "/"
+    routes:
+      - name: user-service-route
+        protocols:
+          - http
+        paths:
+          - /api/v1/users
+        methods:
+          - GET
+          - POST
+        strip_path: false
 
-  - name: create-and-get-posts-route
-    protocols:
-    - http
-    paths:
-    - /v1/posts
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/post_service.proto
+      - name: user-service-get-user-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/users/(?<id>[^/]+)
+        methods:
+          - GET
+        strip_path: false
 
-  - name: get-posts-by-ids-route
-    protocols:
-    - http
-    paths:
-    - /v1/posts/ids
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/post_service.proto
+  - name: post_service
+    protocol: http
+    host: post_complex_service
+    port: 8087
+    path: "/"
+    routes:
+      - name: post-service-route
+        protocols:
+          - http
+        paths:
+          - /api/v1/posts
+        methods:
+          - POST
+        strip_path: false
+      - name: post-service-get-posts-from-user-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/posts/user/(?<id>[^/]+)
+        methods:
+          - GET
+        strip_path: false
 
-  - name: get-posts-by-user-id-route
-    protocols:
-    - http
-    paths:
-    - /v1/posts/user/(?<id>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/post_service.proto
-
-  - name: get-posts-by-user-ids-route
-    protocols:
-    - http
-    paths:
-    - /v1/posts/users
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/post_service.proto
-
-- name: follower_service
-  protocol: grpc
-  host: follower_service
-  port: 8082
-  routes:
-  - name: add-user-route
-    protocols:
-    - http
-    paths:
-    - /v1/followers/users
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/follower_service.proto
-
-  - name: get-followers-route
-    protocols:
-    - http
-    paths:
-    - /v1/followers/(?<id>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/follower_service.proto
-  
-  - name: get-following-route
-    protocols:
-    - http
-    paths:
-    - /v1/following/(?<id>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/follower_service.proto
-
-  - name: add-follower-route
-    protocols:
-    - http
-    paths:
-    - /v1/followers
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/follower_service.proto
-
-  - name: delete-follower-route
-    protocols:
-    - http
-    paths:
-    - /v1/followers/(?<followerID>[^/]+)/(?<followedID>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/follower_service.proto
-  
-- name: user-service
-  protocol: grpc
-  host: user_service
-  port: 8083
-  routes:
-  - name: get-user-route
-    protocols:
-    - http
-    paths:
-    - /v1/users/(?<id>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/user_service.proto
-
-  - name: create-and-get-users-route
-    protocols:
-    - http
-    paths:
-    - /v1/users
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/user_service.proto
-
-- name: feed_service
-  protocol: grpc
-  host: feed_service
-  port: 8084
-  routes:
-  - name: feed-service-route
-    protocols:
-    - http
-    paths:
-    - /v1/feed/(?<userId>[^/]+)
-    plugins:
-    - name: grpc-gateway
-      config:
-        proto: /opt/kong/protos/feed_service.proto
+  - name: follower_service
+    protocol: http
+    host: follower_complex_service
+    port: 8088
+    path: "/"
+    routes:
+      - name: follower-service-followers-route
+        protocols:
+          - http
+        paths:
+          - /api/v1/followers
+        methods:
+          - POST
+          - DELETE
+        strip_path: false
+      - name: follower-service-get-followers-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/followers/(?<id>[^/]+)
+        methods:
+          - GET
+        strip_path: false
+      - name: follower-service-get-following-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/followings/(?<id>[^/]+)
+        methods:
+          - GET
+        strip_path: false
+  - name: feed_service
+    protocol: http
+    host: feed_complex_service
+    port: 8089
+    path: "/"
+    routes:
+      - name: feed-service-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/feeds/(?<id>[^/]+)
+        methods:
+          - GET
+        strip_path: false
 
 consumers:
-- username: frontend
-  jwt_secrets:
-    - algorithm: HS256
-      secret: secret
-      key: issuer
+  - username: frontend
+    jwt_secrets:
+      - algorithm: HS256
+        secret: secret
+        key: issuer
 
-  
 plugins:
-- name: cors
-  config:
-    origins:
-    - http://localhost:3000
-    methods:
-    - GET
-    - POST
-    - PUT
-    - PATCH
-    - DELETE
-    headers:
-    - Accept
-    - Accept-Version
-    - Content-Length
-    - Content-MD5
-    - Content-Type
-    - Date
-    credentials: true
-    max_age: 3600
+  - name: cors
+    config:
+      origins:
+        - http://localhost:3000
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+      credentials: true
+      max_age: 3600
 
-- name: jwt
-  enabled: true
-  config:
-   key_claim_name: iss
-   claims_to_verify:
-    - exp
-   cookie_names:
-   - next-auth.session-token
+  - name: jwt
+    enabled: true
+    config:
+      key_claim_name: iss
+      claims_to_verify:
+        - exp
+      cookie_names:
+        - next-auth.session-token

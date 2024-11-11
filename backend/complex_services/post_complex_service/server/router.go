@@ -19,7 +19,7 @@ func NewRouter(postClient pb.PostServiceClient, producer *services.KafkaProducer
 
 	router.GET("/health", health.Status)
 
-	v1 := router.Group("v1")
+	v1 := router.Group("api/v1")
 	{
 		postsGroup := v1.Group("posts")
 		{
