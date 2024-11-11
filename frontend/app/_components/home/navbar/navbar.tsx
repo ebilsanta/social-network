@@ -9,15 +9,22 @@ import {
 import { signOut } from 'next-auth/react';
 import { Code, Group, rem, TextInput } from '@mantine/core';
 import { MantineLogo } from '@mantinex/mantine-logo';
+import { UserButton } from '@/app/_components/home/navbar/user-button/user-button';
+import { useUser } from '@/providers/user-provider';
 import classes from './navbar.module.css';
 
-const data = [
-  { link: '', label: 'Home', icon: IconHome },
-  { link: '', label: 'Profile', icon: IconUserCircle },
-  { link: '', label: 'Create', icon: IconCirclePlus },
-];
-
 export function Navbar() {
+  const { user } = useUser();
+  const data = [
+    { link: '', label: 'Home', icon: IconHome },
+    { link: '', label: 'Create', icon: IconCirclePlus },
+    {
+      link: '',
+      label: 'Profile',
+      icon: IconUserCircle,
+    },
+  ];
+
   const links = data.map((item) => (
     <a
       className={classes.link}
@@ -50,6 +57,9 @@ export function Navbar() {
       </div>
 
       <div className={classes.footer}>
+        <div className={classes.section}>
+          <UserButton user={user} />
+        </div>
         <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
           <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
           <span>Change account</span>

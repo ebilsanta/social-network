@@ -1,3 +1,5 @@
+'use client';
+
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { signIn } from 'next-auth/react';
 import { Button, Container, Group, Text } from '@mantine/core';

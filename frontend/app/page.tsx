@@ -5,7 +5,7 @@ import { Loader } from '@mantine/core';
 import { Home } from './_components/home/home';
 import { Welcome } from './_components/welcome/welcome';
 
-export default function HomePage() {
+export default function Page() {
   const { data: session, status } = useSession();
   if (status === 'loading') {
     return <Loader />;

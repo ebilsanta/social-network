@@ -2,7 +2,8 @@ import '@mantine/core/styles.css';
 
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { SessionProvider } from '@/providers/nextAuthSessionProvider';
+import { SessionProvider } from '@/providers/next-auth-provider';
+import { UserProvider } from '@/providers/user-provider';
 import { theme } from '../theme';
 
 export const metadata = {
@@ -30,9 +31,11 @@ export default function RootLayout({ children }: { children: any }) {
         }}
       >
         <SessionProvider>
-          <MantineProvider theme={theme} defaultColorScheme="auto">
-            <div style={{ width: '100%' }}>{children}</div>
-          </MantineProvider>
+          <UserProvider>
+            <MantineProvider theme={theme} defaultColorScheme="auto">
+              <div style={{ width: '100%' }}>{children}</div>
+            </MantineProvider>
+          </UserProvider>
         </SessionProvider>
       </body>
     </html>

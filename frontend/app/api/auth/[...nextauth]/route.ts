@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import NextAuth from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 import type { JWT, JWTDecodeParams, JWTEncodeParams } from 'next-auth/jwt';
 import GoogleProvider from 'next-auth/providers/google';
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -29,7 +29,6 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   jwt: {
     async encode(params: JWTEncodeParams): Promise<string> {
-      console.log('token:', JSON.stringify(params.token));
       return jwt.sign(params.token!, params.secret, {
         algorithm: 'HS256',
       });
@@ -38,6 +37,8 @@ const handler = NextAuth({
       return jwt.verify(params.token!, params.secret) as JWT;
     },
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
