@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { Loader } from '@mantine/core';
-import { Home } from './_components/home/home';
+import { Home } from './_components/Home/Home';
 import { Welcome } from './_components/welcome/welcome';
 
 export default function Page() {

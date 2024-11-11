@@ -2,18 +2,18 @@ import {
   IconCirclePlus,
   IconHome,
   IconLogout,
-  IconSearch,
   IconSwitchHorizontal,
   IconUserCircle,
 } from '@tabler/icons-react';
 import { signOut } from 'next-auth/react';
-import { Code, Group, rem, TextInput } from '@mantine/core';
+import { Code, Group, Space } from '@mantine/core';
 import { MantineLogo } from '@mantinex/mantine-logo';
-import { UserButton } from '@/app/_components/home/navbar/user-button/user-button';
+import { ProfileCard } from '@/app/_components/Home/Navbar/ProfileCard/ProfileCard';
+import { UserSearch } from '@/app/_components/Home/Navbar/UserSearch/UserSearch';
 import { useUser } from '@/providers/user-provider';
-import classes from './navbar.module.css';
+import classes from './Navbar.module.css';
 
-export function Navbar() {
+export const Navbar = () => {
   const { user } = useUser();
   const data = [
     { link: '', label: 'Home', icon: IconHome },
@@ -46,19 +46,14 @@ export function Navbar() {
           <MantineLogo size={28} />
           <Code fw={700}>v3.1.2</Code>
         </Group>
-        <TextInput
-          placeholder="Search for users"
-          size="xs"
-          leftSection={<IconSearch style={{ width: rem(12), height: rem(12) }} stroke={1.5} />}
-          styles={{ section: { pointerEvents: 'none' } }}
-          mb="sm"
-        />
+        <UserSearch />
+        <Space h="sm" />
         {links}
       </div>
 
       <div className={classes.footer}>
         <div className={classes.section}>
-          <UserButton user={user} />
+          <ProfileCard user={user} />
         </div>
         <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
           <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
@@ -72,4 +67,4 @@ export function Navbar() {
       </div>
     </nav>
   );
-}
+};

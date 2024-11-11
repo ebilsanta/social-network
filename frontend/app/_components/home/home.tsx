@@ -1,6 +1,6 @@
 'use client';
 
-import { Navbar } from '@/app/_components/home/navbar/navbar';
+import { Navbar } from '@/app/_components/Home/Navbar/Navbar';
 
 export function Home() {
   return <Navbar />;

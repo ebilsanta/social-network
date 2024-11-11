@@ -1,3 +1,5 @@
+import { PaginationMetadata } from '@/types/api';
+
 export interface CreateUserRequest {
   email: string;
   image: string;
@@ -19,4 +21,9 @@ export interface User {
     seconds: number;
     nanos: number;
   };
+}
+
+export interface GetUsersResponse {
+  data: User[];
+  pagination: PaginationMetadata;
 }

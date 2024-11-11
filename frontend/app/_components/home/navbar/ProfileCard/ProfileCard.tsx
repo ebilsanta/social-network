@@ -1,12 +1,12 @@
 import { Avatar, Group, Skeleton, Text, UnstyledButton } from '@mantine/core';
 import { User } from '@/types/user';
-import classes from './user-button.module.css';
+import classes from './ProfileCard.module.css';
 
-interface UserButtonProps {
+interface ProfileCardProps {
   user: User | null;
 }
 
-export function UserButton({ user }: UserButtonProps) {
+export function ProfileCard({ user }: ProfileCardProps) {
   return (
     <Skeleton visible={!user}>
       <UnstyledButton className={classes.user}>

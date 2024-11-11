@@ -1,10 +1,10 @@
-import { CreateUserRequest } from '@/types/user';
+import { CreateUserRequest, GetUsersResponse } from '@/types/user';
 
 export class UserAPI {
   static baseUrl =
     `${process.env.NEXT_PUBLIC_BASE_API_URL}/users` || 'http://localhost:8000/api/v1/users';
 
-  static async getUsers(query = '', page = 1, limit = 10) {
+  static async getUsers(query = '', page = 1, limit = 10): Promise<GetUsersResponse> {
     const url = new URL(this.baseUrl);
     const params = new URLSearchParams({
       query,
