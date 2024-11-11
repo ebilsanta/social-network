@@ -17,6 +17,7 @@ services:
         methods:
           - GET
           - POST
+          - OPTIONS
         strip_path: false
 
       - name: user-service-get-user-route
@@ -41,6 +42,7 @@ services:
           - /api/v1/posts
         methods:
           - POST
+          - OPTIONS
         strip_path: false
       - name: post-service-get-posts-from-user-route
         protocols:
@@ -65,6 +67,7 @@ services:
         methods:
           - POST
           - DELETE
+          - OPTIONS
         strip_path: false
       - name: follower-service-get-followers-route
         protocols:
@@ -115,6 +118,7 @@ plugins:
         - PUT
         - PATCH
         - DELETE
+        - OPTIONS
       headers:
         - Accept
         - Accept-Version
