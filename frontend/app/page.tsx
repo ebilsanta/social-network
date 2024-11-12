@@ -2,8 +2,8 @@
 
 import { useSession } from 'next-auth/react';
 import { Loader } from '@mantine/core';
-import { Home } from './_components/Home/Home';
-import { Welcome } from './_components/welcome/welcome';
+import { Feed } from './_components/Feed/Feed';
+import { Welcome } from './_components/Welcome/Welcome';
 
 export default function Page() {
   const { data: session, status } = useSession();
@@ -11,7 +11,7 @@ export default function Page() {
     return <Loader />;
   }
   if (session) {
-    return <Home />;
+    return <Feed />;
   }
   return (
     <>

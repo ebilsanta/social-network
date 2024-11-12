@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { SimpleGrid } from '@mantine/core';
-import { Post } from '@/app/_components/Home/Feed/Post/Post';
+import { Post } from '@/app/_components/Feed/Post/Post';
 import { FeedAPI } from '@/lib/feed-api';
 
 interface FeedPageProps {

@@ -2,6 +2,7 @@ import '@mantine/core/styles.css';
 
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { Layout } from '@/app/_components/Layout/Layout';
 import { SessionProvider } from '@/providers/next-auth-provider';
 import { UserProvider } from '@/providers/user-provider';
 import { theme } from '../theme';
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: { children: any }) {
         <SessionProvider>
           <UserProvider>
             <MantineProvider theme={theme} defaultColorScheme="auto">
-              <div style={{ width: '100%' }}>{children}</div>
+              <Layout>{children}</Layout>
             </MantineProvider>
           </UserProvider>
         </SessionProvider>

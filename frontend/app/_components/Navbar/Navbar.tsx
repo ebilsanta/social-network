@@ -8,13 +8,16 @@ import {
 import { signOut } from 'next-auth/react';
 import { Code, Group, Space } from '@mantine/core';
 import { MantineLogo } from '@mantinex/mantine-logo';
-import { ProfileCard } from '@/app/_components/Home/Navbar/ProfileCard/ProfileCard';
-import { UserSearch } from '@/app/_components/Home/Navbar/UserSearch/UserSearch';
-import { useUser } from '@/providers/user-provider';
+import { ProfileCard } from '@/app/_components/Navbar/ProfileCard/ProfileCard';
+import { UserSearch } from '@/app/_components/Navbar/UserSearch/UserSearch';
+import { User } from '@/types/user';
 import classes from './Navbar.module.css';
 
-export const Navbar = () => {
-  const { user } = useUser();
+interface NavbarProps {
+  user: User;
+}
+
+export const Navbar = ({ user }: NavbarProps) => {
   const data = [
     { link: '', label: 'Home', icon: IconHome },
     { link: '', label: 'Create', icon: IconCirclePlus },

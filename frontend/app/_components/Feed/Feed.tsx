@@ -1,6 +1,6 @@
 import { Container } from '@mantine/core';
-import { FeedPage } from '@/app/_components/Home/Feed/FeedPage/FeedPage';
-import { useFeed } from '@/app/_components/Home/Feed/useFeed';
+import { FeedPage } from '@/app/_components/Feed/FeedPage/FeedPage';
+import { useFeed } from '@/app/_components/Feed/useFeed';
 
 const LIMIT = 4;
 
@@ -14,7 +14,7 @@ export const Feed = () => {
   }
 
   return (
-    <Container py="xl">
+    <Container py="lg">
       {feedPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }}></div>
     </Container>
   );

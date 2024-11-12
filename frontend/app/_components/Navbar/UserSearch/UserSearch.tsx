@@ -1,5 +1,5 @@
 import { Autocomplete, AutocompleteProps, Avatar, Group, Text } from '@mantine/core';
-import { useUserSearch } from '@/app/_components/Home/Navbar/UserSearch/useUserSearch';
+import { useUserSearch } from '@/app/_components/Navbar/UserSearch/useUserSearch';
 
 export const UserSearch = () => {
   const { usersData, query, setQuery } = useUserSearch();
