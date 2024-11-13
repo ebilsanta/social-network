@@ -9,7 +9,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
 
   return (
-    <div className={classes.container}>
+    <div className={`${user ? classes.containerNavbar : classes.container}`}>
       {user && <Navbar user={user} />}
       <div>{children}</div>
     </div>
