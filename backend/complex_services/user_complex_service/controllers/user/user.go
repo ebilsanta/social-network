@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ebilsanta/social-network/backend/complex_services/user_service/models"
 	"github.com/ebilsanta/social-network/backend/complex_services/user_service/services"
@@ -43,10 +44,19 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 	if err != nil {
 		grpcStatus := status.Code(err)
 		if grpcStatus == codes.AlreadyExists {
-			ctx.JSON(http.StatusConflict, gin.H{
-				"error":   "failed to create user",
-				"details": "user with this email or username already exists",
-			})
+			details := "user with this id, email, or username already exists"
+			duplicateFields := map[string]string{
+				"email":    "user with this email already exists",
+				"username": "user with this username already exists",
+				"id":       "user with this id already exists",
+			}
+			for field, msg := range duplicateFields {
+				if strings.Contains(err.Error(), field) {
+					details = msg
+					break
+				}
+			}
+			ctx.JSON(http.StatusConflict, gin.H{"error": "failed to create user", "details": details})
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user", "details": err.Error()})
@@ -112,6 +122,60 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, &models.GetUserResponse{
 		Data: mapUser(user, true),
+	})
+}
+
+func (uc *UserController) UpdateUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var user models.UpdateUserRequest
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "could not parse body", "details": err.Error()})
+		return
+	}
+
+	updatedUser, err := uc.client.UpdateUser(ctx, &pb.UpdateUserRequest{
+		Id:       id,
+		Username: user.Username,
+		Email:    user.Email,
+		Image:    user.Image,
+		Name:     user.Name,
+	})
+
+	if err != nil {
+		if grpcStatus, ok := status.FromError(err); ok {
+			switch grpcStatus.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"error":   "user not found",
+					"details": grpcStatus.Message(),
+				})
+				return
+			case codes.AlreadyExists:
+				details := "user with this id, email, or username already exists"
+				duplicateFields := map[string]string{
+					"email":    "user with this email already exists",
+					"username": "user with this username already exists",
+					"id":       "user with this id already exists",
+				}
+				for field, msg := range duplicateFields {
+					if strings.Contains(grpcStatus.Message(), field) {
+						details = msg
+						break
+					}
+				}
+				ctx.JSON(http.StatusConflict, gin.H{
+					"error":   "failed to update user",
+					"details": details,
+				})
+				return
+			}
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user", "details": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &models.GetUserResponse{
+		Data: mapUser(updatedUser, true),
 	})
 }
 

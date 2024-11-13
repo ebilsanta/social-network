@@ -12,6 +12,7 @@ service UserService {
   rpc GetUsers (GetUsersRequest) returns (GetUsersResponse) {}
   rpc GetUsersByIds (GetUsersByIdsRequest) returns (GetUsersByIdsResponse) {}
   rpc CreateUser (CreateUserRequest) returns (User) {}
+  rpc UpdateUser (UpdateUserRequest) returns (User) {}
 }
 
 message GetUserRequest {
@@ -34,6 +35,14 @@ message CreateUserRequest {
 
 message GetUsersByIdsRequest {
   repeated string ids = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  optional string email = 2;
+  optional string name = 3;
+  optional string username = 4;
+  optional string image = 5;
 }
 
 message GetUsersResponse {

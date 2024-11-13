@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	proto "github.com/ebilsanta/social-network/backend/feed-gen-service/api/proto/generated"
+	proto "github.com/ebilsanta/social-network/backend/feed-gen-service/proto/generated"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

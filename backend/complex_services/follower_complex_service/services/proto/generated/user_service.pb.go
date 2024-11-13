@@ -250,6 +250,83 @@ func (x *GetUsersByIdsRequest) GetIds() []string {
 	return nil
 }
 
+type UpdateUserRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id       string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Email    *string `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Name     *string `protobuf:"bytes,3,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	Username *string `protobuf:"bytes,4,opt,name=username,proto3,oneof" json:"username,omitempty"`
+	Image    *string `protobuf:"bytes,5,opt,name=image,proto3,oneof" json:"image,omitempty"`
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_user_service_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_service_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_user_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetEmail() string {
+	if x != nil && x.Email != nil {
+		return *x.Email
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetUsername() string {
+	if x != nil && x.Username != nil {
+		return *x.Username
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetImage() string {
+	if x != nil && x.Image != nil {
+		return *x.Image
+	}
+	return ""
+}
+
 type GetUsersResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -261,7 +338,7 @@ type GetUsersResponse struct {
 
 func (x *GetUsersResponse) Reset() {
 	*x = GetUsersResponse{}
-	mi := &file_user_service_proto_msgTypes[4]
+	mi := &file_user_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -273,7 +350,7 @@ func (x *GetUsersResponse) String() string {
 func (*GetUsersResponse) ProtoMessage() {}
 
 func (x *GetUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[4]
+	mi := &file_user_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -286,7 +363,7 @@ func (x *GetUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUsersResponse.ProtoReflect.Descriptor instead.
 func (*GetUsersResponse) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{4}
+	return file_user_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetUsersResponse) GetData() []*User {
@@ -313,7 +390,7 @@ type GetUsersByIdsResponse struct {
 
 func (x *GetUsersByIdsResponse) Reset() {
 	*x = GetUsersByIdsResponse{}
-	mi := &file_user_service_proto_msgTypes[5]
+	mi := &file_user_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -325,7 +402,7 @@ func (x *GetUsersByIdsResponse) String() string {
 func (*GetUsersByIdsResponse) ProtoMessage() {}
 
 func (x *GetUsersByIdsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[5]
+	mi := &file_user_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,7 +415,7 @@ func (x *GetUsersByIdsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUsersByIdsResponse.ProtoReflect.Descriptor instead.
 func (*GetUsersByIdsResponse) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{5}
+	return file_user_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetUsersByIdsResponse) GetData() []*User {
@@ -367,7 +444,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_user_service_proto_msgTypes[6]
+	mi := &file_user_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -379,7 +456,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[6]
+	mi := &file_user_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -392,7 +469,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{6}
+	return file_user_service_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *User) GetId() string {
@@ -479,7 +556,7 @@ type UserPaginationMetadata struct {
 
 func (x *UserPaginationMetadata) Reset() {
 	*x = UserPaginationMetadata{}
-	mi := &file_user_service_proto_msgTypes[7]
+	mi := &file_user_service_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -491,7 +568,7 @@ func (x *UserPaginationMetadata) String() string {
 func (*UserPaginationMetadata) ProtoMessage() {}
 
 func (x *UserPaginationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_user_service_proto_msgTypes[7]
+	mi := &file_user_service_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -504,7 +581,7 @@ func (x *UserPaginationMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPaginationMetadata.ProtoReflect.Descriptor instead.
 func (*UserPaginationMetadata) Descriptor() ([]byte, []int) {
-	return file_user_service_proto_rawDescGZIP(), []int{7}
+	return file_user_service_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserPaginationMetadata) GetTotalRecords() int64 {
@@ -569,7 +646,19 @@ var file_user_service_proto_rawDesc = []byte{
 	0x28, 0x09, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x22, 0x28, 0x0a, 0x14, 0x47, 0x65, 0x74,
 	0x55, 0x73, 0x65, 0x72, 0x73, 0x42, 0x79, 0x49, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x12, 0x10, 0x0a, 0x03, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03,
-	0x69, 0x64, 0x73, 0x22, 0x80, 0x01, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73,
+	0x69, 0x64, 0x73, 0x22, 0xbd, 0x01, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73,
+	0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x19, 0x0a, 0x05, 0x65, 0x6d, 0x61,
+	0x69, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69,
+	0x6c, 0x88, 0x01, 0x01, 0x12, 0x17, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x88, 0x01, 0x01, 0x12, 0x1f, 0x0a,
+	0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x48,
+	0x02, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x88, 0x01, 0x01, 0x12, 0x19,
+	0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x48, 0x03, 0x52,
+	0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x88, 0x01, 0x01, 0x42, 0x08, 0x0a, 0x06, 0x5f, 0x65, 0x6d,
+	0x61, 0x69, 0x6c, 0x42, 0x07, 0x0a, 0x05, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x42, 0x0b, 0x0a, 0x09,
+	0x5f, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x42, 0x08, 0x0a, 0x06, 0x5f, 0x69, 0x6d,
+	0x61, 0x67, 0x65, 0x22, 0x80, 0x01, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x73,
 	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x26, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x65,
 	0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61,
@@ -618,7 +707,7 @@ var file_user_service_proto_rawDesc = []byte{
 	0x67, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x49, 0x6e, 0x74, 0x33, 0x32,
 	0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x08, 0x70, 0x72, 0x65, 0x76, 0x50, 0x61, 0x67, 0x65, 0x32,
-	0xba, 0x02, 0x0a, 0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
+	0xff, 0x02, 0x0a, 0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
 	0x3d, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x12, 0x1c, 0x2e, 0x75, 0x73, 0x65,
 	0x72, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65,
 	0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x5f,
@@ -637,14 +726,19 @@ var file_user_service_proto_rawDesc = []byte{
 	0x65, 0x55, 0x73, 0x65, 0x72, 0x12, 0x1f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x65,
-	0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x22, 0x00, 0x42, 0x66, 0x5a, 0x64,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x62, 0x69, 0x6c, 0x73,
-	0x61, 0x6e, 0x74, 0x61, 0x2f, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2d, 0x6e, 0x65, 0x74, 0x77,
-	0x6f, 0x72, 0x6b, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x63, 0x6f, 0x6d, 0x70,
-	0x6c, 0x65, 0x78, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x66, 0x6f, 0x6c,
-	0x6c, 0x6f, 0x77, 0x65, 0x72, 0x5f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x78, 0x5f, 0x73, 0x65,
-	0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x0a,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x12, 0x1f, 0x2e, 0x75, 0x73, 0x65,
+	0x72, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x75, 0x73,
+	0x65, 0x72, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x22,
+	0x00, 0x42, 0x66, 0x5a, 0x64, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x65, 0x62, 0x69, 0x6c, 0x73, 0x61, 0x6e, 0x74, 0x61, 0x2f, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c,
+	0x2d, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64,
+	0x2f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x78, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x73, 0x2f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x5f, 0x63, 0x6f, 0x6d, 0x70, 0x6c,
+	0x65, 0x78, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -659,37 +753,40 @@ func file_user_service_proto_rawDescGZIP() []byte {
 	return file_user_service_proto_rawDescData
 }
 
-var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_user_service_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_user_service_proto_goTypes = []any{
 	(*GetUserRequest)(nil),         // 0: user_service.GetUserRequest
 	(*GetUsersRequest)(nil),        // 1: user_service.GetUsersRequest
 	(*CreateUserRequest)(nil),      // 2: user_service.CreateUserRequest
 	(*GetUsersByIdsRequest)(nil),   // 3: user_service.GetUsersByIdsRequest
-	(*GetUsersResponse)(nil),       // 4: user_service.GetUsersResponse
-	(*GetUsersByIdsResponse)(nil),  // 5: user_service.GetUsersByIdsResponse
-	(*User)(nil),                   // 6: user_service.User
-	(*UserPaginationMetadata)(nil), // 7: user_service.UserPaginationMetadata
-	(*timestamppb.Timestamp)(nil),  // 8: google.protobuf.Timestamp
-	(*wrapperspb.Int32Value)(nil),  // 9: google.protobuf.Int32Value
+	(*UpdateUserRequest)(nil),      // 4: user_service.UpdateUserRequest
+	(*GetUsersResponse)(nil),       // 5: user_service.GetUsersResponse
+	(*GetUsersByIdsResponse)(nil),  // 6: user_service.GetUsersByIdsResponse
+	(*User)(nil),                   // 7: user_service.User
+	(*UserPaginationMetadata)(nil), // 8: user_service.UserPaginationMetadata
+	(*timestamppb.Timestamp)(nil),  // 9: google.protobuf.Timestamp
+	(*wrapperspb.Int32Value)(nil),  // 10: google.protobuf.Int32Value
 }
 var file_user_service_proto_depIdxs = []int32{
-	6,  // 0: user_service.GetUsersResponse.data:type_name -> user_service.User
-	7,  // 1: user_service.GetUsersResponse.pagination:type_name -> user_service.UserPaginationMetadata
-	6,  // 2: user_service.GetUsersByIdsResponse.data:type_name -> user_service.User
-	8,  // 3: user_service.User.createdAt:type_name -> google.protobuf.Timestamp
-	8,  // 4: user_service.User.deletedAt:type_name -> google.protobuf.Timestamp
-	9,  // 5: user_service.UserPaginationMetadata.nextPage:type_name -> google.protobuf.Int32Value
-	9,  // 6: user_service.UserPaginationMetadata.prevPage:type_name -> google.protobuf.Int32Value
+	7,  // 0: user_service.GetUsersResponse.data:type_name -> user_service.User
+	8,  // 1: user_service.GetUsersResponse.pagination:type_name -> user_service.UserPaginationMetadata
+	7,  // 2: user_service.GetUsersByIdsResponse.data:type_name -> user_service.User
+	9,  // 3: user_service.User.createdAt:type_name -> google.protobuf.Timestamp
+	9,  // 4: user_service.User.deletedAt:type_name -> google.protobuf.Timestamp
+	10, // 5: user_service.UserPaginationMetadata.nextPage:type_name -> google.protobuf.Int32Value
+	10, // 6: user_service.UserPaginationMetadata.prevPage:type_name -> google.protobuf.Int32Value
 	0,  // 7: user_service.UserService.GetUser:input_type -> user_service.GetUserRequest
 	1,  // 8: user_service.UserService.GetUsers:input_type -> user_service.GetUsersRequest
 	3,  // 9: user_service.UserService.GetUsersByIds:input_type -> user_service.GetUsersByIdsRequest
 	2,  // 10: user_service.UserService.CreateUser:input_type -> user_service.CreateUserRequest
-	6,  // 11: user_service.UserService.GetUser:output_type -> user_service.User
-	4,  // 12: user_service.UserService.GetUsers:output_type -> user_service.GetUsersResponse
-	5,  // 13: user_service.UserService.GetUsersByIds:output_type -> user_service.GetUsersByIdsResponse
-	6,  // 14: user_service.UserService.CreateUser:output_type -> user_service.User
-	11, // [11:15] is the sub-list for method output_type
-	7,  // [7:11] is the sub-list for method input_type
+	4,  // 11: user_service.UserService.UpdateUser:input_type -> user_service.UpdateUserRequest
+	7,  // 12: user_service.UserService.GetUser:output_type -> user_service.User
+	5,  // 13: user_service.UserService.GetUsers:output_type -> user_service.GetUsersResponse
+	6,  // 14: user_service.UserService.GetUsersByIds:output_type -> user_service.GetUsersByIdsResponse
+	7,  // 15: user_service.UserService.CreateUser:output_type -> user_service.User
+	7,  // 16: user_service.UserService.UpdateUser:output_type -> user_service.User
+	12, // [12:17] is the sub-list for method output_type
+	7,  // [7:12] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -700,13 +797,14 @@ func file_user_service_proto_init() {
 	if File_user_service_proto != nil {
 		return
 	}
+	file_user_service_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_user_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -22,20 +22,13 @@ func main() {
 		}
 	}()
 
-	followerClient, followerConn := api.InitFollowerService()
-	defer func() {
-		if err := followerConn.Close(); err != nil {
-			log.Printf("Error closing FollowerService connection: %v", err)
-		}
-	}()
-
 	quit := make(chan struct{})
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	consumer := api.StartKafkaConsumer(os.Getenv("KAFKA_BROKER"), quit)
-	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, followerClient, consumer, quit)
+	go api.StartGRPCServer(os.Getenv("SERVER_PORT"), store, consumer, quit)
 
 	<-sigchan
 	close(quit)

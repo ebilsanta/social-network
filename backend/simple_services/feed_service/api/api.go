@@ -4,22 +4,18 @@ import (
 	"context"
 	"log"
 
-	pb "github.com/ebilsanta/social-network/backend/feed-service/api/proto/generated"
+	pb "github.com/ebilsanta/social-network/backend/feed-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/feed-service/storage"
 )
 
 type FeedServiceServer struct {
 	pb.UnimplementedFeedServiceServer
-	store          storage.Storage
-	followerClient pb.FollowerServiceClient
-	postClient     pb.PostServiceClient
+	store storage.Storage
 }
 
-func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, postClient pb.PostServiceClient) *FeedServiceServer {
+func NewServer(store storage.Storage) *FeedServiceServer {
 	return &FeedServiceServer{
-		store:          store,
-		followerClient: followerClient,
-		postClient:     postClient,
+		store: store,
 	}
 }
 
@@ -29,4 +25,3 @@ func (s *FeedServiceServer) GetFeed(ctx context.Context, req *pb.GetFeedRequest)
 
 	return feed, err
 }
-

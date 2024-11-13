@@ -13,16 +13,14 @@ import (
 
 type UserServiceServer struct {
 	pb.UnimplementedUserServiceServer
-	store          storage.Storage
-	followerClient pb.FollowerServiceClient
-	consumer       *kafka.Consumer
+	store    storage.Storage
+	consumer *kafka.Consumer
 }
 
-func NewServer(store storage.Storage, followerClient pb.FollowerServiceClient, consumer *kafka.Consumer) *UserServiceServer {
+func NewServer(store storage.Storage, consumer *kafka.Consumer) *UserServiceServer {
 	return &UserServiceServer{
-		store:          store,
-		followerClient: followerClient,
-		consumer:       consumer,
+		store:    store,
+		consumer: consumer,
 	}
 }
 
@@ -59,6 +57,14 @@ func (s *UserServiceServer) GetUsersByIds(ctx context.Context, req *pb.GetUsersB
 		return nil, err
 	}
 	return res, nil
+}
+
+func (s *UserServiceServer) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.User, error) {
+	dbUser, err := s.store.UpdateUser(req.Id, req.Email, req.Name, req.Username, req.Image)
+	if err != nil {
+		return nil, err
+	}
+	return dbUser, nil
 }
 
 func (s *UserServiceServer) StartUsersListener(quit chan struct{}) {

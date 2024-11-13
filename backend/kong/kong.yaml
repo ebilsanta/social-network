@@ -20,13 +20,14 @@ services:
           - OPTIONS
         strip_path: false
 
-      - name: user-service-get-user-route
+      - name: user-service-get-and-update-user-route
         protocols:
           - http
         paths:
           - ~/api/v1/users/(?<id>[^/]+)
         methods:
           - GET
+          - PUT
         strip_path: false
 
   - name: post_service

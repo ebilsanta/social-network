@@ -24,6 +24,7 @@ type Storage interface {
 	GetUsers(string, int64, int64) (*pb.GetUsersResponse, error)
 	GetUsersByIds([]string) (*pb.GetUsersByIdsResponse, error)
 	GetUser(string) (*pb.User, error)
+	UpdateUser(string, *string, *string, *string, *string) (*pb.User, error)
 	DeleteUser(string) error
 	UpdatePostCount(string, int32) error
 	UpdateFollowerFollowingCount(string, string, int32) error
@@ -52,7 +53,12 @@ func NewMongoStore() (*MongoStore, error) {
 		Options: options.Index().SetUnique(true),
 	}
 
-	_, err = collection.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{usernameIndex, idIndex})
+	emailIndex := mongo.IndexModel{
+		Keys:    bson.D{{Key: "email", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err = collection.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{usernameIndex, idIndex, emailIndex})
 	if err != nil {
 		return nil, err
 	}
@@ -78,15 +84,44 @@ func connectToDB() (*mongo.Client, error) {
 }
 
 func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
-	_, err := s.collection.InsertOne(context.TODO(), user)
-
-	if err != nil {
-		if mongo.IsDuplicateKeyError(err) {
-			return nil, status.Errorf(codes.AlreadyExists, "a user with this id or username already exists")
-		}
-		return nil, err
+	var existingUser types.User
+	err := s.collection.FindOne(context.TODO(), bson.M{"id": user.Id}).Decode(&existingUser)
+	if err == nil {
+		return nil, status.Errorf(codes.AlreadyExists, "user with id %s already exists", user.Id)
 	}
 
+	// Check for unique email and username
+	filter := bson.M{
+		"$or": []bson.M{
+			{"email": user.Email},
+			{"username": user.Username},
+		},
+	}
+
+	cursor, err := s.collection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error checking unique constraints")
+	}
+	defer cursor.Close(context.TODO())
+
+	// Check if any other user has the same email or username
+	for cursor.Next(context.TODO()) {
+		var otherUser types.User
+		if err := cursor.Decode(&otherUser); err == nil {
+			if otherUser.Email == user.Email {
+				return nil, status.Errorf(codes.AlreadyExists, "email %s already in use", user.Email)
+			}
+			if otherUser.Username == user.Username {
+				return nil, status.Errorf(codes.AlreadyExists, "username %s already in use", user.Username)
+			}
+		}
+	}
+
+	_, err = s.collection.InsertOne(context.TODO(), user)
+	if err != nil {
+		return nil, err
+	}
+	
 	return &pb.User{
 		Id:             user.Id,
 		Email:          user.Email,
@@ -198,6 +233,93 @@ func (s *MongoStore) GetUsersByIds(ids []string) (*pb.GetUsersByIdsResponse, err
 
 	return &pb.GetUsersByIdsResponse{
 		Data: users,
+	}, nil
+}
+
+func (s *MongoStore) UpdateUser(id string, email, name, username, image *string) (*pb.User, error) {
+	// Check if the user with the given ID exists
+	var existingUser types.User
+	err := s.collection.FindOne(context.TODO(), bson.M{"id": id}).Decode(&existingUser)
+	if err == mongo.ErrNoDocuments {
+		return nil, status.Errorf(codes.NotFound, "user with id %s not found", id)
+	} else if err != nil {
+		return nil, status.Error(codes.Internal, "error retrieving user")
+	}
+
+	// Check for unique email and username if they are provided
+	if email != nil || username != nil {
+		filter := bson.M{
+			"$or": []bson.M{},
+			"id":  bson.M{"$ne": id},
+		}
+		if email != nil {
+			filter["$or"] = append(filter["$or"].([]bson.M), bson.M{"email": *email})
+		}
+		if username != nil {
+			filter["$or"] = append(filter["$or"].([]bson.M), bson.M{"username": *username})
+		}
+
+		cursor, err := s.collection.Find(context.TODO(), filter)
+		if err != nil {
+			return nil, status.Error(codes.Internal, "error checking unique constraints")
+		}
+		defer cursor.Close(context.TODO())
+
+		// Check if any other user has the same email or username
+		for cursor.Next(context.TODO()) {
+			var otherUser types.User
+			if err := cursor.Decode(&otherUser); err == nil {
+				if email != nil && otherUser.Email == *email {
+					return nil, status.Errorf(codes.AlreadyExists, "email %s already in use", *email)
+				}
+				if username != nil && otherUser.Username == *username {
+					return nil, status.Errorf(codes.AlreadyExists, "username %s already in use", *username)
+				}
+			}
+		}
+	}
+
+	update := bson.M{"$set": bson.M{}}
+	if email != nil {
+		update["$set"].(bson.M)["email"] = *email
+	}
+	if name != nil {
+		update["$set"].(bson.M)["name"] = *name
+	}
+	if username != nil {
+		update["$set"].(bson.M)["username"] = *username
+	}
+	if image != nil {
+		update["$set"].(bson.M)["image"] = *image
+	}
+
+	var updatedUser types.User
+	err = s.collection.FindOneAndUpdate(
+		context.TODO(),
+		bson.M{"id": id},
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After),
+	).Decode(&updatedUser)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error updating user %s", id)
+	}
+
+	var deletedAtTimestamp *timestamppb.Timestamp
+	if updatedUser.DeletedAt != nil {
+		deletedAtTimestamp = timestamppb.New(*updatedUser.DeletedAt)
+	}
+
+	return &pb.User{
+		Id:             updatedUser.Id,
+		Email:          updatedUser.Email,
+		Name:           updatedUser.Name,
+		Username:       updatedUser.Username,
+		Image:          updatedUser.Image,
+		PostCount:      updatedUser.PostCount,
+		FollowerCount:  updatedUser.FollowerCount,
+		FollowingCount: updatedUser.FollowingCount,
+		CreatedAt:      timestamppb.New(updatedUser.CreatedAt),
+		DeletedAt:      deletedAtTimestamp,
 	}, nil
 }
 

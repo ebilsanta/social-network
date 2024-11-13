@@ -13,3 +13,10 @@ type GetUsersRequest struct {
 	Limit int64  `form:"limit,default=10" binding:"min=1,max=100"`
 	Query string `form:"query"`
 }
+
+type UpdateUserRequest struct {
+	Email    *string `json:"email" binding:"omitempty,email"`
+	Image    *string `json:"image" binding:"omitempty,uri"`
+	Name     *string `json:"name" binding:"omitempty"`
+	Username *string `json:"username" binding:"omitempty"`
+}

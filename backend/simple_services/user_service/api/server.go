@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func StartGRPCServer(port string, store storage.Storage, followerClient pb.FollowerServiceClient, consumer *kafka.Consumer, quit chan struct{}) {
+func StartGRPCServer(port string, store storage.Storage, consumer *kafka.Consumer, quit chan struct{}) {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	log.Default().Println("User service running on port:", os.Getenv("SERVER_PORT"))
 
@@ -22,7 +22,7 @@ func StartGRPCServer(port string, store storage.Storage, followerClient pb.Follo
 	}
 
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
-	server := NewServer(store, followerClient, consumer)
+	server := NewServer(store, consumer)
 	go server.StartUsersListener(quit)
 
 	pb.RegisterUserServiceServer(grpcServer, server)

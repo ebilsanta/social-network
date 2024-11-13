@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/ebilsanta/social-network/backend/feed-service/api"
-	pb "github.com/ebilsanta/social-network/backend/feed-service/api/proto/generated"
+	pb "github.com/ebilsanta/social-network/backend/feed-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/feed-service/storage"
 	"google.golang.org/grpc"
 )
@@ -30,21 +30,7 @@ func main() {
 	}
 	log.Default().Println("Feed service running on port:", os.Getenv("SERVER_PORT"))
 
-	followerClient, followerConn := api.InitFollowerService()
-	defer func() {
-		if err := followerConn.Close(); err != nil {
-			log.Printf("Error closing FollowerService connection: %v", err)
-		}
-	}()
-
-	postClient, postConn := api.InitPostService()
-	defer func() {
-		if err := postConn.Close(); err != nil {
-			log.Printf("Error closing PostService connection: %v", err)
-		}
-	}()
-
 	grpcServer := grpc.NewServer()
-	pb.RegisterFeedServiceServer(grpcServer, api.NewServer(store, followerClient, postClient))
+	pb.RegisterFeedServiceServer(grpcServer, api.NewServer(store))
 	grpcServer.Serve(lis)
 }

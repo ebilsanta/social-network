@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	pb "github.com/ebilsanta/social-network/backend/feed-gen-service/api/proto/generated"
+	pb "github.com/ebilsanta/social-network/backend/feed-gen-service/proto/generated"
 	"github.com/ebilsanta/social-network/backend/feed-gen-service/storage"
 )
 

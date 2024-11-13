@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	pb "github.com/ebilsanta/social-network/backend/feed-service/api/proto/generated"
+	pb "github.com/ebilsanta/social-network/backend/feed-service/proto/generated"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -91,7 +91,7 @@ func (s *RedisStore) GetFeed(id string, page, limit int32) (*pb.GetFeedResponse,
 	}
 
 	totalPages := int32(totalRecords) / limit
-	if totalRecords % int64(limit) > 0 {
+	if totalRecords%int64(limit) > 0 {
 		totalPages++
 	}
 
