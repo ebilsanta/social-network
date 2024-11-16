@@ -27,6 +27,7 @@ func NewRouter(userClient pb.UserServiceClient, producer *services.KafkaProducer
 			usersGroup.POST("/", userController.CreateUser)
 			usersGroup.PUT("/:id", userController.UpdateUser)
 			usersGroup.GET("/:id", userController.GetUser)
+			usersGroup.GET("/username/:username", userController.GetUser)
 		}
 	}
 	return router

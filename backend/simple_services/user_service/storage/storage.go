@@ -24,6 +24,7 @@ type Storage interface {
 	GetUsers(string, int64, int64) (*pb.GetUsersResponse, error)
 	GetUsersByIds([]string) (*pb.GetUsersByIdsResponse, error)
 	GetUser(string) (*pb.User, error)
+	GetUserByUsername(string) (*pb.User, error)
 	UpdateUser(string, *string, *string, *string, *string) (*pb.User, error)
 	DeleteUser(string) error
 	UpdatePostCount(string, int32) error
@@ -121,7 +122,7 @@ func (s *MongoStore) CreateUser(user *types.User) (*pb.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &pb.User{
 		Id:             user.Id,
 		Email:          user.Email,
@@ -200,6 +201,20 @@ func (s *MongoStore) GetUser(id string) (*pb.User, error) {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, status.Errorf(codes.NotFound, "user with id %s not found", id)
+		}
+		return nil, err
+	}
+
+	return decodeUser(user), nil
+}
+
+func (s *MongoStore) GetUserByUsername(username string) (*pb.User, error) {
+	var user types.User
+	err := s.collection.FindOne(context.TODO(), primitive.M{"username": username}).Decode(&user)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, status.Errorf(codes.NotFound, "user with username %s not found", username)
 		}
 		return nil, err
 	}

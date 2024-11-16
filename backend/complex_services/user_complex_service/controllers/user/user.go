@@ -125,6 +125,27 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 	})
 }
 
+func (uc *UserController) GetUserByUsername(ctx *gin.Context) {
+	username := ctx.Param("username")
+	user, err := uc.client.GetUserByUsername(ctx, &pb.GetUserByUsernameRequest{Username: username})
+	if err != nil {
+		grpcStatus := status.Code(err)
+		if grpcStatus == codes.NotFound {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error":   "user not found",
+				"details": fmt.Sprintf("user with username %s not found", username),
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user", "details": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &models.GetUserResponse{
+		Data: mapUser(user, false),
+	})
+}
+
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var user models.UpdateUserRequest

@@ -9,6 +9,7 @@ import "google/protobuf/wrappers.proto";
 
 service UserService {
   rpc GetUser (GetUserRequest) returns (User) {}
+  rpc GetUserByUsername (GetUserByUsernameRequest) returns (User) {}
   rpc GetUsers (GetUsersRequest) returns (GetUsersResponse) {}
   rpc GetUsersByIds (GetUsersByIdsRequest) returns (GetUsersByIdsResponse) {}
   rpc CreateUser (CreateUserRequest) returns (User) {}
@@ -17,6 +18,10 @@ service UserService {
 
 message GetUserRequest {
   string id = 1;
+}
+
+message GetUserByUsernameRequest {
+  string username = 1;
 }
 
 message GetUsersRequest {

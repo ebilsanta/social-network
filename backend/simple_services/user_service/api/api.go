@@ -43,6 +43,14 @@ func (s *UserServiceServer) GetUser(ctx context.Context, req *pb.GetUserRequest)
 	return user, nil
 }
 
+func (s *UserServiceServer) GetUserByUsername(ctx context.Context, req *pb.GetUserByUsernameRequest) (*pb.User, error) {
+	user, err := s.store.GetUserByUsername(req.Username)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (s *UserServiceServer) GetUsers(ctx context.Context, req *pb.GetUsersRequest) (*pb.GetUsersResponse, error) {
 	res, err := s.store.GetUsers(req.Query, req.Page, req.Limit)
 	if err != nil {

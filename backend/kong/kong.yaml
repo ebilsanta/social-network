@@ -30,6 +30,15 @@ services:
           - PUT
         strip_path: false
 
+      - name: user-service-get-by-username-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/users/username/(?<username>[^/]+)
+        methods:
+          - GET
+        strip_path: false
+
   - name: post_service
     protocol: http
     host: post_complex_service
