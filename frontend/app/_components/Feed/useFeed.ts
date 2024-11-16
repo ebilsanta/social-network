@@ -4,12 +4,13 @@ import { useUser } from '@/providers/user-provider';
 export const useFeed = () => {
   const { user } = useUser();
   const [page, setPage] = useState(1);
+  const [morePages, setMorePages] = useState(true);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (morePages && entry.isIntersecting) {
           setPage((prevPage) => prevPage + 1);
         }
       },
@@ -28,11 +29,12 @@ export const useFeed = () => {
         observer.unobserve(loadMoreRef.current);
       }
     };
-  }, []);
+  }, [morePages]);
 
   return {
     user,
     page,
+    setMorePages,
     loadMoreRef,
   };
 };

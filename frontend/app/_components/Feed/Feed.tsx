@@ -5,11 +5,13 @@ import { useFeed } from '@/app/_components/Feed/useFeed';
 const LIMIT = 4;
 
 export const Feed = () => {
-  const { user, page, loadMoreRef } = useFeed();
+  const { user, page, setMorePages, loadMoreRef } = useFeed();
   const feedPages = [];
   if (user) {
     for (let i = 1; i <= page; i += 1) {
-      feedPages.push(<FeedPage key={i} userId={user!.id} index={i} limit={LIMIT} />);
+      feedPages.push(
+        <FeedPage key={i} userId={user!.id} index={i} limit={LIMIT} setMorePages={setMorePages} />
+      );
     }
   }
 
