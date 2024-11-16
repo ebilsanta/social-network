@@ -14,7 +14,7 @@ import { User } from '@/types/user';
 import classes from './Navbar.module.css';
 
 interface NavbarProps {
-  user: User;
+  user: User | null;
 }
 
 export const Navbar = ({ user }: NavbarProps) => {

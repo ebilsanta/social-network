@@ -32,7 +32,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const fetchUserData = async (userSession: Session) => {
     try {
       const userData = await UserAPI.getUser(userSession.user.id as string);
-      setUser(userData);
+      setUser(userData.data);
     } catch (getUserErr) {
       if (getUserErr instanceof Error && getUserErr.message === 'User not found') {
         const { id, email, name, image } = userSession.user;
@@ -44,7 +44,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             name: name as string,
             username: name as string,
           });
-          setUser(newUser);
+          setUser(newUser.data);
         } catch (createUserErr) {
           if (createUserErr instanceof Error) {
             console.error(createUserErr.message);

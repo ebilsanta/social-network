@@ -27,3 +27,7 @@ export interface GetUsersResponse {
   data: User[];
   pagination: PaginationMetadata;
 }
+
+export interface GetUserResponse {
+  data: User;
+}

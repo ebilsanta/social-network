@@ -1,4 +1,4 @@
-import { CreateUserRequest, GetUsersResponse } from '@/types/user';
+import { CreateUserRequest, GetUserResponse, GetUsersResponse } from '@/types/user';
 
 export class UserAPI {
   static baseUrl =
@@ -25,7 +25,7 @@ export class UserAPI {
     return response.json();
   }
 
-  static async getUser(id: string) {
+  static async getUser(id: string): Promise<GetUserResponse> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'GET',
       credentials: 'include',
@@ -39,10 +39,10 @@ export class UserAPI {
       throw new Error('Error fetching user');
     }
 
-    return response.json().then((data) => data.data);
+    return response.json();
   }
 
-  static async createUser(userData: CreateUserRequest): Promise<any> {
+  static async createUser(userData: CreateUserRequest): Promise<GetUserResponse> {
     const response = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
@@ -56,6 +56,6 @@ export class UserAPI {
       throw new Error('Error creating user');
     }
 
-    return response.json().then((data) => data.data);
+    return response.json();
   }
 }
