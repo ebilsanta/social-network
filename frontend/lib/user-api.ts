@@ -42,6 +42,23 @@ export class UserAPI {
     return response.json();
   }
 
+  static async getUserByUsername(username: string): Promise<GetUserResponse> {
+    const response = await fetch(`${this.baseUrl}/username/${username}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (response.status === 404) {
+      throw new Error('User not found');
+    }
+
+    if (!response.ok) {
+      throw new Error('Error fetching user');
+    }
+
+    return response.json();
+  }
+
   static async createUser(userData: CreateUserRequest): Promise<GetUserResponse> {
     const response = await fetch(this.baseUrl, {
       method: 'POST',
