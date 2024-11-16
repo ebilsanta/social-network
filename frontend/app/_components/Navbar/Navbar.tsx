@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import {
   IconCirclePlus,
   IconHome,
@@ -45,7 +46,12 @@ export const Navbar = ({ user }: NavbarProps) => {
   return (
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
-        <Group className={classes.header} justify="space-between">
+        <Group
+          className={classes.header}
+          justify="space-between"
+          onClick={() => redirect('/')}
+          style={{ cursor: 'pointer' }}
+        >
           <MantineLogo size={36} />
           <Code fw={700}>v3.1.2</Code>
         </Group>

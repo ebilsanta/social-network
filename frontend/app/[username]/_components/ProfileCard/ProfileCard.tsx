@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, Button, Center, Flex, Skeleton, Text } from '@mantine/core';
-import { useProfileCard } from '@/app/[username]/ProfileCard/useProfileCard';
+import { useProfileCard } from '@/app/[username]/_components/ProfileCard/useProfileCard';
 import Loading from '@/components/loading';
 import { User } from '@/types/user';
 

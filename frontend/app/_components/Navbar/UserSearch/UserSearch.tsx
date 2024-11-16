@@ -1,18 +1,28 @@
-import { Autocomplete, AutocompleteProps, Avatar, Group, Text } from '@mantine/core';
+import { redirect } from 'next/navigation';
+import {
+  Autocomplete,
+  AutocompleteProps,
+  Avatar,
+  Group,
+  Text,
+  UnstyledButton,
+} from '@mantine/core';
 import { useUserSearch } from '@/app/_components/Navbar/UserSearch/useUserSearch';
 
 export const UserSearch = () => {
   const { usersData, query, setQuery } = useUserSearch();
   const renderAutocompleteOption: AutocompleteProps['renderOption'] = ({ option }) => (
-    <Group gap="sm">
-      <Avatar src={usersData[option.value].image} size={36} radius="xl" />
-      <div>
-        <Text size="sm">{option.value}</Text>
-        <Text size="xs" opacity={0.6}>
-          {usersData[option.value].name}
-        </Text>
-      </div>
-    </Group>
+    <UnstyledButton onClick={() => redirect(`/${option.value}`)} style={{ width: '100%' }}>
+      <Group gap="sm">
+        <Avatar src={usersData[option.value].image} size={36} radius="xl" />
+        <div>
+          <Text size="sm">{option.value}</Text>
+          <Text size="xs" opacity={0.6}>
+            {usersData[option.value].name}
+          </Text>
+        </div>
+      </Group>
+    </UnstyledButton>
   );
   return (
     <Autocomplete

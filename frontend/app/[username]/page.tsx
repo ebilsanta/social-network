@@ -1,4 +1,4 @@
-import { ProfileCard } from '@/app/[username]/ProfileCard/ProfileCard';
+import { ProfileCard } from '@/app/[username]/_components/ProfileCard/ProfileCard';
 import Loading from '@/components/loading';
 
 export default async function Page({ params }: { params: Promise<{ username: string }> }) {
