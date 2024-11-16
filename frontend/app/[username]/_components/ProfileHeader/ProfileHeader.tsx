@@ -1,8 +1,9 @@
 'use client';
 
 import { Avatar, Button, Center, Flex, Skeleton, Text } from '@mantine/core';
-import { useProfileCard } from '@/app/[username]/_components/ProfileCard/useProfileCard';
+import { useProfileHeader } from '@/app/[username]/_components/ProfileHeader/useProfileHeader';
 import Loading from '@/components/loading';
+import NotFound from '@/components/not-found';
 import { User } from '@/types/user';
 
 interface Stat {
@@ -16,17 +17,17 @@ const stats: Stat[] = [
   { field: 'followingCount', label: 'Following' },
 ];
 
-interface ProfileCardProps {
+interface ProfileHeaderProps {
   username: string | undefined;
 }
 
-export const ProfileCard = ({ username }: ProfileCardProps) => {
-  const { data: user, error } = useProfileCard(username);
+export const ProfileHeader = ({ username }: ProfileHeaderProps) => {
+  const { data: user, error } = useProfileHeader(username);
   if (error) {
-    return <Text color="red">Error: {error.message}</Text>;
+    return <NotFound />;
   }
   if (!user) {
-    return <Loading></Loading>;
+    return <Loading />;
   }
 
   return (

@@ -1,41 +1,32 @@
 import { redirect } from 'next/navigation';
-import {
-  IconCirclePlus,
-  IconHome,
-  IconLogout,
-  IconSwitchHorizontal,
-  IconUserCircle,
-} from '@tabler/icons-react';
-import { signOut } from 'next-auth/react';
+import { IconLogout, IconSwitchHorizontal } from '@tabler/icons-react';
+import { signIn, signOut } from 'next-auth/react';
 import { Code, Group, Space } from '@mantine/core';
 import { MantineLogo } from '@mantinex/mantine-logo';
 import { ProfileCard } from '@/app/_components/Navbar/ProfileCard/ProfileCard';
+import { useNavbar } from '@/app/_components/Navbar/useNavbar';
 import { UserSearch } from '@/app/_components/Navbar/UserSearch/UserSearch';
 import { User } from '@/types/user';
 import classes from './Navbar.module.css';
 
 interface NavbarProps {
-  user: User | null;
+  user: User;
 }
 
 export const Navbar = ({ user }: NavbarProps) => {
-  const data = [
-    { link: '', label: 'Home', icon: IconHome },
-    { link: '', label: 'Create', icon: IconCirclePlus },
-    {
-      link: '',
-      label: 'Profile',
-      icon: IconUserCircle,
-    },
-  ];
+  const { data, path } = useNavbar(user);
 
   const links = data.map((item) => (
     <a
       className={classes.link}
       href={item.link}
       key={item.label}
+      data-active={item.link === path || undefined}
       onClick={(event) => {
         event.preventDefault();
+        if (item.link) {
+          redirect(item.link);
+        }
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
@@ -61,10 +52,8 @@ export const Navbar = ({ user }: NavbarProps) => {
       </div>
 
       <div className={classes.footer}>
-        <div className={classes.section}>
-          <ProfileCard user={user} />
-        </div>
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
+        <ProfileCard user={user} />
+        <a href="#" className={classes.link} onClick={() => signIn()}>
           <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
           <span>Change account</span>
         </a>

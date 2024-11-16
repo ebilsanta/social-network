@@ -1,4 +1,4 @@
-import { ProfileCard } from '@/app/[username]/_components/ProfileCard/ProfileCard';
+import { ProfileHeader } from '@/app/[username]/_components/ProfileHeader/ProfileHeader';
 import Loading from '@/components/loading';
 
 export default async function Page({ params }: { params: Promise<{ username: string }> }) {
@@ -6,5 +6,5 @@ export default async function Page({ params }: { params: Promise<{ username: str
   if (!username) {
     return <Loading />;
   }
-  return <ProfileCard username={username} />;
+  return <ProfileHeader username={username} />;
 }

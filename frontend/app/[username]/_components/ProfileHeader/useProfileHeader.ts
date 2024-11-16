@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { UserAPI } from '@/lib/user-api';
 
-export const useProfileCard = (username?: string) => {
+export const useProfileHeader = (username?: string) => {
   const fetchUser = async () => {
     const response = await UserAPI.getUserByUsername(username!);
     return response.data;
