@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import useSWR from 'swr';
-import { AspectRatio, Grid, Image } from '@mantine/core';
+import { AspectRatio, Card, Image, SimpleGrid } from '@mantine/core';
 import { PostAPI } from '@/lib/post-api';
 
 interface ProfilePostsPageProps {
@@ -30,14 +30,14 @@ export const ProfilePostsPage = ({ userId, index, limit, setMorePages }: Profile
   }
 
   return (
-    <Grid gutter="md">
+    <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }}>
       {data.data.map((post) => (
-        <Grid.Col key={post.id} span={{ base: 12, md: 4 }}>
+        <Card key={post.id} radius="sm" component="a" href="#" m={0} p={0}>
           <AspectRatio ratio={1}>
             <Image src={post.image} />
           </AspectRatio>
-        </Grid.Col>
+        </Card>
       ))}
-    </Grid>
+    </SimpleGrid>
   );
 };

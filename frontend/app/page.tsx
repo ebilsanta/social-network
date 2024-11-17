@@ -13,9 +13,5 @@ export default function Page() {
   if (session) {
     return <Feed />;
   }
-  return (
-    <>
-      <Welcome />
-    </>
-  );
+  return <Welcome />;
 }

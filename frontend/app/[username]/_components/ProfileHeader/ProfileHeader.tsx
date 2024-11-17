@@ -32,7 +32,7 @@ export const ProfileHeader = ({ username }: ProfileHeaderProps) => {
 
   return (
     <Center>
-      <Skeleton visible={!user} width={600}>
+      <Skeleton visible={!user}>
         <Flex py={32} justify="center">
           <Center style={{ marginRight: 40 }}>
             <Avatar src={user?.image} size={120} />

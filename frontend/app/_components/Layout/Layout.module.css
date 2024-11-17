@@ -2,13 +2,12 @@
   display: flex;
   justify-content: flex-start;
   gap: 20px;
-}
-
-.containerNavbar {
-  display: flex;
-  justify-content: flex-start;
-  gap: 20px;
-  margin-left: rem(300px);
+  &[data-navbar] {
+    margin-left: rem(260px);
+  }
+  &[data-minimized] {
+    margin-left: rem(80px);
+  }
 }
 
 .content {

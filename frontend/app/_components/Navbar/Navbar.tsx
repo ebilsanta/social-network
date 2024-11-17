@@ -11,9 +11,10 @@ import classes from './Navbar.module.css';
 
 interface NavbarProps {
   user: User;
+  isSmallScreen: boolean | undefined;
 }
 
-export const Navbar = ({ user }: NavbarProps) => {
+export const Navbar = ({ user, isSmallScreen }: NavbarProps) => {
   const { data, path } = useNavbar(user);
 
   const links = data.map((item) => (
@@ -22,6 +23,7 @@ export const Navbar = ({ user }: NavbarProps) => {
       href={item.link}
       key={item.label}
       data-active={item.link === path || undefined}
+      data-minimized={isSmallScreen || undefined}
       onClick={(event) => {
         event.preventDefault();
         if (item.link) {
@@ -35,7 +37,7 @@ export const Navbar = ({ user }: NavbarProps) => {
   ));
 
   return (
-    <nav className={classes.navbar}>
+    <nav className={classes.navbar} data-minimized={isSmallScreen || undefined}>
       <div className={classes.navbarMain}>
         <Group
           className={classes.header}

@@ -9,7 +9,7 @@ export default async function Page({ params }: { params: Promise<{ username: str
     return <Loading />;
   }
   return (
-    <Container mx="md">
+    <Container px="md">
       <ProfileHeader username={username} />
       <Divider />
       <ProfilePosts />

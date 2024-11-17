@@ -23,7 +23,7 @@ export const ProfilePosts = () => {
     }
   }
   return (
-    <Container my="xl" mx={0} px={0}>
+    <Container my="xl">
       {postPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }} />
     </Container>
   );
