@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation';
-import { IconLogout, IconSwitchHorizontal } from '@tabler/icons-react';
-import { signIn, signOut } from 'next-auth/react';
 import { Code, Group, Space } from '@mantine/core';
 import { MantineLogo } from '@mantinex/mantine-logo';
+import { NavbarAction } from '@/app/_components/Navbar/NavbarAction/NavbarAction';
 import { ProfileCard } from '@/app/_components/Navbar/ProfileCard/ProfileCard';
 import { useNavbar } from '@/app/_components/Navbar/useNavbar';
 import { UserSearch } from '@/app/_components/Navbar/UserSearch/UserSearch';
@@ -15,25 +14,28 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ user, isSmallScreen }: NavbarProps) => {
-  const { data, path } = useNavbar(user);
+  const { navbarActions, navbarLinks } = useNavbar(user);
 
-  const links = data.map((item) => (
-    <a
-      className={classes.link}
-      href={item.link}
+  const links = navbarLinks.map((item) => (
+    <NavbarAction
       key={item.label}
-      data-active={item.link === path || undefined}
-      data-minimized={isSmallScreen || undefined}
-      onClick={(event) => {
-        event.preventDefault();
-        if (item.link) {
-          redirect(item.link);
-        }
-      }}
-    >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
-      <span>{item.label}</span>
-    </a>
+      icon={item.icon}
+      label={item.label}
+      onClick={item.onClick}
+      active={item.active}
+      isSmallScreen={isSmallScreen}
+    />
+  ));
+
+  const actions = navbarActions.map((action, index) => (
+    <NavbarAction
+      key={index}
+      icon={action.icon}
+      label={action.label}
+      onClick={action.onClick}
+      active={action.active}
+      isSmallScreen={isSmallScreen}
+    />
   ));
 
   return (
@@ -50,20 +52,13 @@ export const Navbar = ({ user, isSmallScreen }: NavbarProps) => {
         </Group>
         <UserSearch />
         <Space h="sm" />
+
         {links}
       </div>
 
       <div className={classes.footer}>
-        <ProfileCard user={user} />
-        <a href="#" className={classes.link} onClick={() => signIn()}>
-          <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-          <span>Change account</span>
-        </a>
-
-        <a href="#" className={classes.link} onClick={() => signOut()}>
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
-        </a>
+        <ProfileCard user={user} isSmallScreen={isSmallScreen} />
+        {actions}
       </div>
     </nav>
   );

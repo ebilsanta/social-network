@@ -5,22 +5,27 @@ import classes from './ProfileCard.module.css';
 
 interface ProfileCardProps {
   user: User | null;
+  isSmallScreen?: boolean;
 }
 
-export function ProfileCard({ user }: ProfileCardProps) {
+export function ProfileCard({ user, isSmallScreen }: ProfileCardProps) {
   return (
     <Skeleton visible={!user}>
-      <UnstyledButton className={classes.user} onClick={() => redirect(user?.username!)}>
-        <Group>
+      <UnstyledButton
+        className={classes.user}
+        data-minimized={isSmallScreen || undefined}
+        onClick={() => redirect(user?.username!)}
+      >
+        <Group justify="center">
           <Avatar src={user ? user.image : ''} radius="xl" />
 
           <div style={{ flex: 1 }}>
             <Text size="sm" fw={500}>
-              {user ? user.name : ''}
+              {user && !isSmallScreen ? user.name : null}
             </Text>
 
             <Text c="dimmed" size="xs">
-              {user ? user.username : ''}
+              {user && !isSmallScreen ? user.username : null}
             </Text>
           </div>
         </Group>
