@@ -1,3 +1,5 @@
+import { PaginationMetadata } from '@/types/api';
+
 export interface Post {
   id: string;
   caption: string;
@@ -7,4 +9,9 @@ export interface Post {
     seconds: number;
     nanos: number;
   };
+}
+
+export interface GetPostsByUserIdResponse {
+  data: Post[];
+  pagination: PaginationMetadata;
 }

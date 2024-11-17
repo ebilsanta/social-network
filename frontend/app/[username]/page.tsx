@@ -1,4 +1,6 @@
+import { Container, Divider } from '@mantine/core';
 import { ProfileHeader } from '@/app/[username]/_components/ProfileHeader/ProfileHeader';
+import { ProfilePosts } from '@/app/[username]/_components/ProfilePosts/ProfilePosts';
 import Loading from '@/components/loading';
 
 export default async function Page({ params }: { params: Promise<{ username: string }> }) {
@@ -6,5 +8,11 @@ export default async function Page({ params }: { params: Promise<{ username: str
   if (!username) {
     return <Loading />;
   }
-  return <ProfileHeader username={username} />;
+  return (
+    <Container mx="md">
+      <ProfileHeader username={username} />
+      <Divider />
+      <ProfilePosts />
+    </Container>
+  );
 }

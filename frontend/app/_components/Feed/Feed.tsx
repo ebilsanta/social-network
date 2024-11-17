@@ -17,7 +17,7 @@ export const Feed = () => {
 
   return (
     <Container py="lg">
-      {feedPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }}></div>
+      {feedPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }} />
     </Container>
   );
 };
