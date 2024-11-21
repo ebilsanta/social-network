@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(userClient pb.UserServiceClient, producer *services.KafkaProducer) *gin.Engine {
+func NewRouter(userClient pb.UserServiceClient, followerClient pb.FollowerServiceClient, producer *services.KafkaProducer) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	userController := user.NewUserController(userClient, producer)
+	userController := user.NewUserController(userClient, followerClient, producer)
 
 	health := new(controllers.HealthController)
 
@@ -27,9 +27,9 @@ func NewRouter(userClient pb.UserServiceClient, producer *services.KafkaProducer
 			usersGroup.POST("/", userController.CreateUser)
 			usersGroup.PUT("/:id", userController.UpdateUser)
 			usersGroup.GET("/username/:username", userController.GetUserByUsername)
-			usersGroup.GET("/:id", userController.GetUser)
+			usersGroup.GET("/:id/following/:followedId", userController.GetIdHandler)
+			usersGroup.GET("/:id", userController.GetIdHandler)
 		}
 	}
 	return router
-
 }

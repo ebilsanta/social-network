@@ -35,3 +35,7 @@ type PaginationMetadata struct {
 	NextPage     *int64 `json:"nextPage"`
 	PrevPage     *int64 `json:"prevPage"`
 }
+
+type CheckFollowingResponse struct {
+	Following bool `json:"following"`
+}

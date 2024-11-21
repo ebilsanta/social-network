@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package follower_service;
 
-option go_package = "github.com/ebilsanta/social-network/backend/feed-gen-service/api/proto";
+option go_package = "github.com/ebilsanta/social-network/backend/complex_services/user-service/services/proto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";

@@ -55,6 +55,10 @@ func (s *FollowerServiceServer) DeleteFollower(ctx context.Context, req *pb.Dele
 	return nil, err
 }
 
+func (s *FollowerServiceServer) CheckFollowing(ctx context.Context, req *pb.CheckFollowingRequest) (*pb.CheckFollowingResponse, error) {
+	return s.store.CheckFollowing(req.FollowerID, req.FollowedID)
+}
+
 func (s *FollowerServiceServer) ListenKafkaEvents(quit chan struct{}) {
 	for {
 		select {

@@ -13,6 +13,7 @@ service FollowerService {
   rpc GetFollowing (GetFollowingRequest) returns (GetFollowingResponse) {}
   rpc AddFollower (AddFollowerRequest) returns (google.protobuf.Empty) {}
   rpc DeleteFollower (DeleteFollowerRequest) returns (google.protobuf.Empty) {}
+  rpc CheckFollowing (CheckFollowingRequest) returns (CheckFollowingResponse) {}
 }
 
 message AddUserRequest {
@@ -57,4 +58,13 @@ message FollowerPaginationMetadata {
   int32 totalPages = 3;
   google.protobuf.Int32Value nextPage = 4;
   google.protobuf.Int32Value prevPage = 5;
+}
+
+message CheckFollowingRequest {
+  string followerID = 1;
+  string followedID = 2;
+}
+
+message CheckFollowingResponse {
+  bool following = 1;
 }

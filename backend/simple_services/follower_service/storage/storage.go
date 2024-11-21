@@ -18,6 +18,7 @@ type Storage interface {
 	GetFollowing(string, int32, int32) (*pb.GetFollowingResponse, error)
 	AddFollower(string, string) error
 	DeleteFollower(string, string) error
+	CheckFollowing(string, string) (*pb.CheckFollowingResponse, error)
 }
 
 type GraphStore struct {
@@ -352,6 +353,17 @@ func (s *GraphStore) DeleteFollower(followerID, followedID string) error {
 	}
 
 	return nil
+}
+
+func (s *GraphStore) CheckFollowing(followerID, followedID string) (*pb.CheckFollowingResponse, error) {
+	exists, err := s.userFollows(followerID, followedID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CheckFollowingResponse{
+		Following: exists,
+	}, nil
 }
 
 func (s *GraphStore) userExists(userID string) (bool, error) {

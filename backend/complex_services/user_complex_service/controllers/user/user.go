@@ -15,14 +15,16 @@ import (
 )
 
 type UserController struct {
-	client   pb.UserServiceClient
-	producer *services.KafkaProducer
+	userClient     pb.UserServiceClient
+	followerClient pb.FollowerServiceClient
+	producer       *services.KafkaProducer
 }
 
-func NewUserController(client pb.UserServiceClient, producer *services.KafkaProducer) *UserController {
+func NewUserController(userClient pb.UserServiceClient, followerClient pb.FollowerServiceClient, producer *services.KafkaProducer) *UserController {
 	return &UserController{
-		client:   client,
-		producer: producer,
+		userClient:     userClient,
+		followerClient: followerClient,
+		producer:       producer,
 	}
 }
 
@@ -33,7 +35,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	createdUser, err := uc.client.CreateUser(ctx, &pb.CreateUserRequest{
+	createdUser, err := uc.userClient.CreateUser(ctx, &pb.CreateUserRequest{
 		Username: user.Username,
 		Email:    user.Email,
 		Image:    user.Image,
@@ -90,7 +92,7 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 		return
 	}
 
-	users, err := uc.client.GetUsers(ctx, &pb.GetUsersRequest{
+	users, err := uc.userClient.GetUsers(ctx, &pb.GetUsersRequest{
 		Query: params.Query,
 		Page:  params.Page,
 		Limit: params.Limit,
@@ -104,9 +106,18 @@ func (uc *UserController) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, mapGetUsersResponse(users))
 }
 
+func (uc *UserController) GetIdHandler(c *gin.Context) {
+	followedId := c.Param("followedId")
+	if followedId == "" {
+		uc.GetUser(c)
+	} else {
+		uc.CheckFollowing(c)
+	}
+}
+
 func (uc *UserController) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
-	user, err := uc.client.GetUser(ctx, &pb.GetUserRequest{Id: id})
+	user, err := uc.userClient.GetUser(ctx, &pb.GetUserRequest{Id: id})
 	if err != nil {
 		grpcStatus := status.Code(err)
 		if grpcStatus == codes.NotFound {
@@ -127,7 +138,7 @@ func (uc *UserController) GetUser(ctx *gin.Context) {
 
 func (uc *UserController) GetUserByUsername(ctx *gin.Context) {
 	username := ctx.Param("username")
-	user, err := uc.client.GetUserByUsername(ctx, &pb.GetUserByUsernameRequest{Username: username})
+	user, err := uc.userClient.GetUserByUsername(ctx, &pb.GetUserByUsernameRequest{Username: username})
 	if err != nil {
 		grpcStatus := status.Code(err)
 		if grpcStatus == codes.NotFound {
@@ -154,7 +165,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	updatedUser, err := uc.client.UpdateUser(ctx, &pb.UpdateUserRequest{
+	updatedUser, err := uc.userClient.UpdateUser(ctx, &pb.UpdateUserRequest{
 		Id:       id,
 		Username: user.Username,
 		Email:    user.Email,
@@ -197,6 +208,23 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, &models.GetUserResponse{
 		Data: mapUser(updatedUser, true),
+	})
+}
+
+func (uc *UserController) CheckFollowing(ctx *gin.Context) {
+	followerID := ctx.Param("id")
+	followedID := ctx.Param("followedId")
+	resp, err := uc.followerClient.CheckFollowing(ctx, &pb.CheckFollowingRequest{
+		FollowerID: followerID,
+		FollowedID: followedID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check following", "details": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &models.CheckFollowingResponse{
+		Following: resp.Following,
 	})
 }
 

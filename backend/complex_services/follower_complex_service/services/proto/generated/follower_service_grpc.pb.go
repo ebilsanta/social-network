@@ -25,6 +25,7 @@ const (
 	FollowerService_GetFollowing_FullMethodName   = "/follower_service.FollowerService/GetFollowing"
 	FollowerService_AddFollower_FullMethodName    = "/follower_service.FollowerService/AddFollower"
 	FollowerService_DeleteFollower_FullMethodName = "/follower_service.FollowerService/DeleteFollower"
+	FollowerService_CheckFollowing_FullMethodName = "/follower_service.FollowerService/CheckFollowing"
 )
 
 // FollowerServiceClient is the client API for FollowerService service.
@@ -36,6 +37,7 @@ type FollowerServiceClient interface {
 	GetFollowing(ctx context.Context, in *GetFollowingRequest, opts ...grpc.CallOption) (*GetFollowingResponse, error)
 	AddFollower(ctx context.Context, in *AddFollowerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteFollower(ctx context.Context, in *DeleteFollowerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CheckFollowing(ctx context.Context, in *CheckFollowingRequest, opts ...grpc.CallOption) (*CheckFollowingResponse, error)
 }
 
 type followerServiceClient struct {
@@ -96,6 +98,16 @@ func (c *followerServiceClient) DeleteFollower(ctx context.Context, in *DeleteFo
 	return out, nil
 }
 
+func (c *followerServiceClient) CheckFollowing(ctx context.Context, in *CheckFollowingRequest, opts ...grpc.CallOption) (*CheckFollowingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckFollowingResponse)
+	err := c.cc.Invoke(ctx, FollowerService_CheckFollowing_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FollowerServiceServer is the server API for FollowerService service.
 // All implementations must embed UnimplementedFollowerServiceServer
 // for forward compatibility.
@@ -105,6 +117,7 @@ type FollowerServiceServer interface {
 	GetFollowing(context.Context, *GetFollowingRequest) (*GetFollowingResponse, error)
 	AddFollower(context.Context, *AddFollowerRequest) (*emptypb.Empty, error)
 	DeleteFollower(context.Context, *DeleteFollowerRequest) (*emptypb.Empty, error)
+	CheckFollowing(context.Context, *CheckFollowingRequest) (*CheckFollowingResponse, error)
 	mustEmbedUnimplementedFollowerServiceServer()
 }
 
@@ -129,6 +142,9 @@ func (UnimplementedFollowerServiceServer) AddFollower(context.Context, *AddFollo
 }
 func (UnimplementedFollowerServiceServer) DeleteFollower(context.Context, *DeleteFollowerRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFollower not implemented")
+}
+func (UnimplementedFollowerServiceServer) CheckFollowing(context.Context, *CheckFollowingRequest) (*CheckFollowingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckFollowing not implemented")
 }
 func (UnimplementedFollowerServiceServer) mustEmbedUnimplementedFollowerServiceServer() {}
 func (UnimplementedFollowerServiceServer) testEmbeddedByValue()                         {}
@@ -241,6 +257,24 @@ func _FollowerService_DeleteFollower_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FollowerService_CheckFollowing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckFollowingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FollowerServiceServer).CheckFollowing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FollowerService_CheckFollowing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FollowerServiceServer).CheckFollowing(ctx, req.(*CheckFollowingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FollowerService_ServiceDesc is the grpc.ServiceDesc for FollowerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -267,6 +301,10 @@ var FollowerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFollower",
 			Handler:    _FollowerService_DeleteFollower_Handler,
+		},
+		{
+			MethodName: "CheckFollowing",
+			Handler:    _FollowerService_CheckFollowing_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
