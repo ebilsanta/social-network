@@ -50,7 +50,7 @@ export const Navbar = ({ user, isSmallScreen }: NavbarProps) => {
           <MantineLogo size={36} />
           <Code fw={700}>v3.1.2</Code>
         </Group>
-        <UserSearch />
+        <UserSearch isSmallScreen={isSmallScreen} />
         <Space h="sm" />
 
         {links}
