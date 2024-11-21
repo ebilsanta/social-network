@@ -31,3 +31,7 @@ export interface GetUsersResponse {
 export interface GetUserResponse {
   data: User;
 }
+
+export interface CheckFollowingResponse {
+  following: boolean;
+}

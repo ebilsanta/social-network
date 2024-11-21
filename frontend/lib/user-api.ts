@@ -1,4 +1,9 @@
-import { CreateUserRequest, GetUserResponse, GetUsersResponse } from '@/types/user';
+import {
+  CheckFollowingResponse,
+  CreateUserRequest,
+  GetUserResponse,
+  GetUsersResponse,
+} from '@/types/user';
 
 export class UserAPI {
   static baseUrl =
@@ -71,6 +76,22 @@ export class UserAPI {
 
     if (!response.ok) {
       throw new Error('Error creating user');
+    }
+
+    return response.json();
+  }
+
+  static async checkFollowing(
+    followerId: string,
+    followingId: string
+  ): Promise<CheckFollowingResponse> {
+    const response = await fetch(`${this.baseUrl}/${followerId}/following/${followingId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Error checking following');
     }
 
     return response.json();

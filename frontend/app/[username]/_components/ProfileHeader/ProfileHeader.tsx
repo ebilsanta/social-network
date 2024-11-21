@@ -1,6 +1,7 @@
 'use client';
 
-import { Avatar, Button, Center, Flex, Skeleton, Text } from '@mantine/core';
+import { Avatar, Center, Flex, Skeleton, Text } from '@mantine/core';
+import { FollowButton } from '@/app/[username]/_components/ProfileHeader/FollowButton/FollowButton';
 import { useProfileHeader } from '@/app/[username]/_components/ProfileHeader/useProfileHeader';
 import Loading from '@/components/loading';
 import NotFound from '@/components/not-found';
@@ -9,12 +10,13 @@ import { User } from '@/types/user';
 interface Stat {
   field: keyof User;
   label: string;
+  pluralLabel: string;
 }
 
 const stats: Stat[] = [
-  { field: 'postCount', label: 'Posts' },
-  { field: 'followerCount', label: 'Followers' },
-  { field: 'followingCount', label: 'Following' },
+  { field: 'postCount', label: 'Post', pluralLabel: 'Posts' },
+  { field: 'followerCount', label: 'Follower', pluralLabel: 'Followers' },
+  { field: 'followingCount', label: 'Following', pluralLabel: 'Following' },
 ];
 
 interface ProfileHeaderProps {
@@ -22,38 +24,49 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ username }: ProfileHeaderProps) => {
-  const { data: user, error } = useProfileHeader(username);
-  if (error) {
+  const {
+    currentUser,
+    profileUser,
+    profileUserError,
+    isFollowing,
+    handleFollowUser,
+    handleUnfollowUser,
+  } = useProfileHeader(username);
+  if (profileUserError) {
     return <NotFound />;
   }
-  if (!user) {
+  if (!profileUser) {
     return <Loading />;
   }
 
   return (
     <Center>
-      <Skeleton visible={!user}>
+      <Skeleton visible={!profileUser}>
         <Flex py={32} justify="center">
           <Center style={{ marginRight: 40 }}>
-            <Avatar src={user?.image} size={120} />
+            <Avatar src={profileUser?.image} size={120} />
           </Center>
           <Flex direction="column" gap="lg" justify="center">
             <Flex justify="space-between" align="center">
               <Text fz="lg" fw={600}>
-                {user?.username}
+                {profileUser?.username}
               </Text>
-              <Button size="xs" variant="variant">
-                Follow
-              </Button>
+              <FollowButton
+                currentUser={currentUser}
+                profileUser={profileUser}
+                isFollowing={isFollowing}
+                handleFollowUser={handleFollowUser}
+                handleUnfollowUser={handleUnfollowUser}
+              />
             </Flex>
             <Flex gap="xl" align="center">
               {stats.map((stat) => (
                 <Text key={stat.label} fz="sm" fw={600}>
-                  {`${user?.[stat.field]} ${stat.label}`}
+                  {`${profileUser?.[stat.field]} ${profileUser?.[stat.field] !== 1 ? stat.pluralLabel : stat.label}`}
                 </Text>
               ))}
             </Flex>
-            <Text fw={500}>{user?.name}</Text>
+            <Text fw={500}>{profileUser?.name}</Text>
           </Flex>
         </Flex>
       </Skeleton>

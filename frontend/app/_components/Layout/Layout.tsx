@@ -17,7 +17,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       data-minimized={(user && isSmallScreen) || undefined}
     >
       {user && <Navbar user={user} isSmallScreen={isSmallScreen} />}
-      <div>{children}</div>
+      <div className={classes.content}>{children}</div>
     </div>
   );
 };
