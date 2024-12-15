@@ -199,6 +199,7 @@ services:
     environment:
       - SERVER_PORT=${POST_COMPLEX_SVC_PORT}
       - POST_SVC_PORT=${POST_SVC_PORT}
+      - USER_SVC_PORT=${USER_SVC_PORT}
       - KAFKA_BROKER=${KAFKA_BROKER}
     tty: true
     build: ./complex_services/post_complex_service

@@ -2,6 +2,7 @@ package models
 
 import (
 	pb "github.com/ebilsanta/social-network/backend/complex_services/post_service/services/proto/generated"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type CreatePostResponse struct {
@@ -9,7 +10,16 @@ type CreatePostResponse struct {
 }
 
 type GetPostResponse struct {
-	Data *pb.Post `json:"data"`
+	Data *Post `json:"data"`
+}
+
+type Post struct {
+	Id        int64                  `json:"id,omitempty"`
+	Caption   string                 `json:"caption,omitempty"`
+	Image     string                 `json:"image,omitempty"`
+	User      *pb.User               `json:"user,omitempty"`
+	CreatedAt *timestamppb.Timestamp `json:"createdAt,omitempty"`
+	DeletedAt *timestamppb.Timestamp `json:"deletedAt,omitempty"`
 }
 
 type GetPostsResponse struct {

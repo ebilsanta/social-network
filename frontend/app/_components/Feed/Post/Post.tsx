@@ -1,11 +1,11 @@
 'use client';
 
-import { AspectRatio, Card, Image, Text } from '@mantine/core';
+import { AspectRatio, Avatar, Card, Flex, Image, Text } from '@mantine/core';
 import { Post as APIPost } from '@/types/post';
 import classes from './Post.module.css';
 
 export const Post = ({ post }: { post: APIPost }) => {
-  const { createdAt, caption, image } = post;
+  const { createdAt, caption, image, user } = post;
   const handlePostClick = (id: string) => {
     window.history.pushState(null, '', `/p/${id}`);
   };
@@ -17,6 +17,10 @@ export const Post = ({ post }: { post: APIPost }) => {
       className={classes.card}
       onClick={() => handlePostClick(post?.id)}
     >
+      <Flex gap={10} mb={10} align="center">
+        <Avatar src={user.image} radius="xl" />
+        <Text fw={600}>{user.username}</Text>
+      </Flex>
       <AspectRatio ratio={1920 / 1080}>
         <Image src={image} />
       </AspectRatio>

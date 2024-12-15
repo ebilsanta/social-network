@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
-import { AspectRatio, Card, Image, Modal, Notification, Text } from '@mantine/core';
+import { AspectRatio, Avatar, Card, Flex, Image, Modal, Notification, Text } from '@mantine/core';
 import { PostAPI } from '@/lib/post-api';
 
 const PostModal = ({ postId }: { postId: string }) => {
@@ -26,6 +26,10 @@ const PostModal = ({ postId }: { postId: string }) => {
   return (
     <Modal opened centered onClose={handleClose} size="1000px">
       <Card p="md" radius="md" onClick={() => {}}>
+        <Flex gap={10} mb={10} align="center">
+          <Avatar src={post?.user?.image} radius="xl" />
+          <Text fw={600}>{post?.user.username}</Text>
+        </Flex>
         <AspectRatio ratio={1920 / 1080}>
           <Image src={post?.image} />
         </AspectRatio>

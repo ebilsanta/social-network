@@ -12,14 +12,16 @@ import (
 )
 
 type PostController struct {
-	client   pb.PostServiceClient
-	producer *services.KafkaProducer
+	postClient pb.PostServiceClient
+	userClient pb.UserServiceClient
+	producer   *services.KafkaProducer
 }
 
-func NewPostController(client pb.PostServiceClient, producer *services.KafkaProducer) *PostController {
+func NewPostController(postClient pb.PostServiceClient, userClient pb.UserServiceClient, producer *services.KafkaProducer) *PostController {
 	return &PostController{
-		client:   client,
-		producer: producer,
+		postClient: postClient,
+		userClient: userClient,
+		producer:   producer,
 	}
 }
 
@@ -30,7 +32,7 @@ func (pc *PostController) CreatePost(ctx *gin.Context) {
 		return
 	}
 
-	createdPost, err := pc.client.CreatePost(ctx, &pb.CreatePostRequest{
+	createdPost, err := pc.postClient.CreatePost(ctx, &pb.CreatePostRequest{
 		Image:   post.Image,
 		Caption: post.Caption,
 		UserId:  post.UserId,
@@ -61,16 +63,35 @@ func (pc *PostController) GetPostById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid post id", "details": err.Error()})
 		return
 	}
-	post, err := pc.client.GetPost(ctx, &pb.GetPostRequest{
+	post, err := pc.postClient.GetPost(ctx, &pb.GetPostRequest{
 		Id: int64(id),
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get post", "details": err.Error()})
 		return
 	}
+	user, err := pc.userClient.GetUsersByIds(ctx, &pb.GetUsersByIdsRequest{
+		Ids: []string{post.UserId},
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user", "details": err.Error()})
+		return
+	}
+	if len(user.Data) == 0 {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "user not found"})
+		return
+	}
+	user.Data[0].Email = ""
 
 	resp := &models.GetPostResponse{
-		Data: post,
+		Data: &models.Post{
+			Id:        post.Id,
+			Caption:   post.Caption,
+			Image:     post.Image,
+			User:      user.Data[0],
+			CreatedAt: post.CreatedAt,
+			DeletedAt: post.DeletedAt,
+		},
 	}
 
 	ctx.JSON(http.StatusOK, resp)
@@ -84,7 +105,7 @@ func (pc *PostController) GetPostsByUserId(ctx *gin.Context) {
 		return
 	}
 
-	posts, err := pc.client.GetPostsByUserId(ctx, &pb.GetPostsByUserRequest{
+	posts, err := pc.postClient.GetPostsByUserId(ctx, &pb.GetPostsByUserRequest{
 		Id:    id,
 		Page:  int32(query.Page),
 		Limit: int32(query.Limit),

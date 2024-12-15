@@ -11,8 +11,11 @@ import (
 )
 
 func Init() {
-	postClient, conn := services.InitPostService()
-	defer conn.Close()
+	postClient, postConn := services.InitPostService()
+	defer postConn.Close()
+
+	userClient, userConn := services.InitUserService()
+	defer userConn.Close()
 
 	quit := make(chan struct{})
 	producer := services.StartKafkaProducer(os.Getenv("KAFKA_BROKER"), quit)
@@ -26,6 +29,6 @@ func Init() {
 		log.Println("Shutting down post complex service producer")
 	}()
 
-	r := NewRouter(postClient, producer)
+	r := NewRouter(postClient, userClient, producer)
 	r.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")))
 }

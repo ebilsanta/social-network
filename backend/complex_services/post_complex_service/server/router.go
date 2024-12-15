@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(postClient pb.PostServiceClient, producer *services.KafkaProducer) *gin.Engine {
+func NewRouter(postClient pb.PostServiceClient, userClient pb.UserServiceClient, producer *services.KafkaProducer) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	postController := post.NewPostController(postClient, producer)
+	postController := post.NewPostController(postClient, userClient, producer)
 
 	health := new(controllers.HealthController)
 
