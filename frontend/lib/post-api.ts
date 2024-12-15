@@ -1,8 +1,21 @@
-import { GetPostsByUserIdResponse } from '@/types/post';
+import { GetPostByIdResponse, GetPostsByUserIdResponse } from '@/types/post';
 
 export class PostAPI {
   static baseUrl =
     `${process.env.NEXT_PUBLIC_BASE_API_URL}/posts` || 'http://localhost:8000/api/v1/posts';
+
+  static async getPostById(postId: string): Promise<GetPostByIdResponse> {
+    const response = await fetch(`${this.baseUrl}/${postId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Error fetching post');
+    }
+
+    return response.json();
+  }
 
   static async getPostsByUserId(
     userId: string,

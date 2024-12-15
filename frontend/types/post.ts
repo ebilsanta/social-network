@@ -11,6 +11,10 @@ export interface Post {
   };
 }
 
+export interface GetPostByIdResponse {
+  data: Post;
+}
+
 export interface GetPostsByUserIdResponse {
   data: Post[];
   pagination: PaginationMetadata;
