@@ -42,7 +42,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             email: email as string,
             image: image as string,
             name: name as string,
-            username: name as string,
+            username: email?.split('@')[0] as string,
           });
           setUser(newUser.data);
         } catch (createUserErr) {
