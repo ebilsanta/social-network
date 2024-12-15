@@ -17,7 +17,7 @@ export const Feed = () => {
   }
 
   return (
-    <Container py="lg">
+    <Container py="lg" size="xs">
       {feedPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }} />
       {postId && <PostModal postId={postId} />}
     </Container>

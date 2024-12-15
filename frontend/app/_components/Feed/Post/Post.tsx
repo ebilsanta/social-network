@@ -21,7 +21,7 @@ export const Post = ({ post }: { post: APIPost }) => {
         <Image src={image} />
       </AspectRatio>
       <Text c="dimmed" size="xs" tt="uppercase" fw={700} mt="md">
-        {createdAt && createdAt.seconds}
+        {createdAt && new Date(createdAt.seconds * 1000).toLocaleDateString()}
       </Text>
       <Text className={classes.title} mt={5}>
         {caption}
