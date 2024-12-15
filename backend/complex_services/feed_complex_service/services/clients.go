@@ -31,3 +31,14 @@ func InitPostService() (proto.PostServiceClient, *grpc.ClientConn) {
 	postClient := proto.NewPostServiceClient(conn)
 	return postClient, conn
 }
+
+func InitUserService() (proto.UserServiceClient, *grpc.ClientConn) {
+	userServiceAddr := fmt.Sprintf("user_service:%s", "8083")
+
+	conn, err := grpc.NewClient(userServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("failed to connect to user service: %v", err)
+	}
+	userClient := proto.NewUserServiceClient(conn)
+	return userClient, conn
+}

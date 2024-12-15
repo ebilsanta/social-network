@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(feedClient pb.FeedServiceClient, postClient pb.PostServiceClient) *gin.Engine {
+func NewRouter(feedClient pb.FeedServiceClient, postClient pb.PostServiceClient, userClient pb.UserServiceClient) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	feedController := feed.NewFeedController(feedClient, postClient)
+	feedController := feed.NewFeedController(feedClient, postClient, userClient)
 
 	health := new(controllers.HealthController)
 

@@ -126,6 +126,7 @@ services:
       - REDIS_URL=redis://${FEED_DB_USER}:${FEED_DB_PASSWORD}@feed_db
       - FOLLOWER_SVC_PORT=${FOLLOWER_SVC_PORT}
       - POST_SVC_PORT=${POST_SVC_PORT}
+      - USER_SVC_PORT=${USER_SVC_PORT}
     tty: true
     build: ./simple_services/feed_service
     ports:

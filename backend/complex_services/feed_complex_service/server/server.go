@@ -14,6 +14,9 @@ func Init() {
 	postClient, postConn := services.InitPostService()
 	defer postConn.Close()
 
-	r := NewRouter(feedClient, postClient)
+	userClient, userConn := services.InitUserService()
+	defer userConn.Close()
+
+	r := NewRouter(feedClient, postClient, userClient)
 	r.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")))
 }

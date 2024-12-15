@@ -12,12 +12,14 @@ import (
 type FeedController struct {
 	feedClient pb.FeedServiceClient
 	postClient pb.PostServiceClient
+	userClient pb.UserServiceClient
 }
 
-func NewFeedController(feedClient pb.FeedServiceClient, postClient pb.PostServiceClient) *FeedController {
+func NewFeedController(feedClient pb.FeedServiceClient, postClient pb.PostServiceClient, userClient pb.UserServiceClient) *FeedController {
 	return &FeedController{
 		feedClient: feedClient,
 		postClient: postClient,
+		userClient: userClient,
 	}
 }
 
@@ -39,9 +41,9 @@ func (c *FeedController) GetFeed(ctx *gin.Context) {
 		return
 	}
 
-	if postIds.Data == nil || len(postIds.Data) == 0 {
+	if len(postIds.Data) == 0 {
 		ctx.JSON(http.StatusOK, &models.GetFeedResponse{
-			Data:       []*pb.Post{},
+			Data:       []*models.Post{},
 			Pagination: mapPaginationMetadata(postIds.Pagination),
 		})
 		return
@@ -56,8 +58,37 @@ func (c *FeedController) GetFeed(ctx *gin.Context) {
 		return
 	}
 
+	userIds := make([]string, 0, len(posts.Posts))
+	for _, post := range posts.Posts {
+		userIds = append(userIds, post.UserId)
+	}
+
+	users, err := c.userClient.GetUsersByIds(ctx, &pb.GetUsersByIdsRequest{Ids: userIds})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get users", "details": err.Error()})
+		return
+	}
+
+	userMap := make(map[string]*pb.User)
+	for _, user := range users.Data {
+		userMap[user.Id] = user
+		userMap[user.Email] = nil
+	}
+
+	postsWithUser := make([]*models.Post, 0, len(posts.Posts))
+	for _, post := range posts.Posts {
+		postsWithUser = append(postsWithUser, &models.Post{
+			Id:        post.Id,
+			Caption:   post.Caption,
+			Image:     post.Image,
+			User:      userMap[post.UserId],
+			CreatedAt: post.CreatedAt,
+			DeletedAt: post.DeletedAt,
+		})
+	}
+
 	ctx.JSON(http.StatusOK, &models.GetFeedResponse{
-		Data:       posts.Posts,
+		Data:       postsWithUser,
 		Pagination: mapPaginationMetadata(postIds.Pagination),
 	})
 }
