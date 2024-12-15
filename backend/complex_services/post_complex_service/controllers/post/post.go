@@ -55,6 +55,27 @@ func (pc *PostController) CreatePost(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, resp)
 }
 
+func (pc *PostController) GetPostById(ctx *gin.Context) {
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid post id", "details": err.Error()})
+		return
+	}
+	post, err := pc.client.GetPost(ctx, &pb.GetPostRequest{
+		Id: int64(id),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get post", "details": err.Error()})
+		return
+	}
+
+	resp := &models.GetPostResponse{
+		Data: post,
+	}
+
+	ctx.JSON(http.StatusOK, resp)
+}
+
 func (pc *PostController) GetPostsByUserId(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var query models.GetPostsByUserRequest

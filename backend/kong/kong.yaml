@@ -54,6 +54,14 @@ services:
           - POST
           - OPTIONS
         strip_path: false
+      - name: post-service-get-posts-by-id-route
+        protocols:
+          - http
+        paths:
+          - ~/api/v1/posts/(?<id>[^/]+)
+        methods:
+          - GET
+        strip_path: false
       - name: post-service-get-posts-from-user-route
         protocols:
           - http

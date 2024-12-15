@@ -8,6 +8,10 @@ type CreatePostResponse struct {
 	Data *pb.Post `json:"data"`
 }
 
+type GetPostResponse struct {
+	Data *pb.Post `json:"data"`
+}
+
 type GetPostsResponse struct {
 	Data       []*pb.Post          `json:"data"`
 	Pagination *PaginationMetadata `json:"pagination"`
