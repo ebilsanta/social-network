@@ -1,3 +1,4 @@
+import { UnauthorizedError } from '@/lib/errors';
 import { GetPostByIdResponse, GetPostsByUserIdResponse } from '@/types/post';
 
 export class PostAPI {
@@ -9,6 +10,10 @@ export class PostAPI {
       method: 'GET',
       credentials: 'include',
     });
+
+    if (response.status === 401) {
+      throw new UnauthorizedError('Unauthorized');
+    }
 
     if (!response.ok) {
       throw new Error('Error fetching post');

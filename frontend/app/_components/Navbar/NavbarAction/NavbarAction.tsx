@@ -22,7 +22,7 @@ export const NavbarAction = ({ icon, label, onClick, active, isSmallScreen }: Na
       disabled={!isSmallScreen}
     >
       <a
-        href=""
+        href="#"
         className={classes.link}
         data-minimized={dataMinimized}
         data-active={dataActive}

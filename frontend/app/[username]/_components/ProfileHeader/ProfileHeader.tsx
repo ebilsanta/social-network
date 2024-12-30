@@ -3,8 +3,8 @@
 import { Avatar, Center, Flex, Skeleton, Text } from '@mantine/core';
 import { FollowButton } from '@/app/[username]/_components/ProfileHeader/FollowButton/FollowButton';
 import { useProfileHeader } from '@/app/[username]/_components/ProfileHeader/useProfileHeader';
-import Loading from '@/components/loading';
-import NotFound from '@/components/not-found';
+import Loading from '@/components/Loading';
+import NotFound from '@/components/NotFound';
 import { User } from '@/types/user';
 
 interface Stat {

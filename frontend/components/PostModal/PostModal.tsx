@@ -24,7 +24,7 @@ const PostModal = ({ postId }: { postId: string }) => {
   }
 
   return (
-    <Modal opened centered onClose={handleClose} size="1000px">
+    <Modal opened centered onClose={handleClose} size="800px">
       <Card p="md" radius="md" onClick={() => {}}>
         <Flex gap={10} mb={10} align="center">
           <Avatar src={post?.user?.image} radius="xl" />

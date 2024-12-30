@@ -1,5 +1,3 @@
-'use client';
-
 import { AspectRatio, Avatar, Card, Flex, Image, Text } from '@mantine/core';
 import { Post as APIPost } from '@/types/post';
 import classes from './Post.module.css';
