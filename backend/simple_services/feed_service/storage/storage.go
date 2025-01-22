@@ -58,7 +58,7 @@ func (s *RedisStore) GetFeed(id string, page, limit int32) (*pb.GetFeedResponse,
 	key := fmt.Sprintf("feed:%s", id)
 
 	now := time.Now().Unix()
-	sevenDaysAgo := now - 7*24*60*60
+	// sevenDaysAgo := now - 7*24*60*60
 	offset := (page - 1) * limit
 
 	posts, err := s.Client.ZRevRangeByScore(
@@ -89,7 +89,10 @@ func (s *RedisStore) GetFeed(id string, page, limit int32) (*pb.GetFeedResponse,
 	totalRecords, err := s.Client.ZCount(
 		context.Background(),
 		key,
-		fmt.Sprintf("%d", sevenDaysAgo),
+		// temporarily remove the time range filter
+		// set unlimited min
+		fmt.Sprintf("0"),
+		// fmt.Sprintf("%d", sevenDaysAgo),
 		fmt.Sprintf("%d", now),
 	).Result()
 	if err != nil {

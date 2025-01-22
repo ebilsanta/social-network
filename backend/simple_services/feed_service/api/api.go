@@ -22,6 +22,7 @@ func NewServer(store storage.Storage) *FeedServiceServer {
 func (s *FeedServiceServer) GetFeed(ctx context.Context, req *pb.GetFeedRequest) (*pb.GetFeedResponse, error) {
 	log.Default().Printf("feed_service GetFeed request: %v", req)
 	feed, err := s.store.GetFeed(req.UserId, req.Page, req.Limit)
+	log.Default().Printf("feed_service GetFeed response: %v", feed)
 
 	return feed, err
 }
