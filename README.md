@@ -13,7 +13,7 @@ Some of the following parts are still in progress, such as the uploading of post
 ## Architecture
 Below is a high-level system design diagram that outlines the key components of the application architecture:
 
-<img width="2608" alt="social-network (2)" src="https://github.com/user-attachments/assets/5be6c6ff-ed58-4ce5-947c-9d5a5ba00163">
+<img width="2608" alt="Social Network System Design" src="https://github.com/user-attachments/assets/540d1fa2-90c1-489f-b008-31c0730b1174" />
 
 ## Key Technologies
 This project is designed to leverage a wide range of technologies, including:
@@ -21,13 +21,13 @@ This project is designed to leverage a wide range of technologies, including:
 - **Databases**: PostgreSQL, MongoDB, Neo4j Graph Database
 - **Caching and Queuing**: Redis, Kafka
 - **API Gateway**: Kong API Gateway
-- **Cloud Storage and Delivery**: Amazon S3, AWS CloudFront
-- **Real-time Notifications**: Firebase
+- **Cloud Storage and Delivery**: Amazon S3, AWS CloudFront (unimplemented)
+- **Real-time Notifications**: Firebase (unimplemented)
 - **Containerization**: Docker Compose
 - **Inter-service Communication**: gRPC
 
 ## Key Features
-- **Prefetching and Caching**: Efficient feed loading using caching mechanisms to improve user experience.
+- **Prefetching and Caching**: Efficient feed generation using caching mechanisms to improve user experience.
 - **Event-driven Architecture**: Kafka is used to process events such as:
   - Generating user feeds when a post is created or a user is followed.
   - Updating user post/following counts asynchronously
