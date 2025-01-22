@@ -47,7 +47,7 @@ export const Navbar = ({ user, isSmallScreen }: NavbarProps) => {
           onClick={() => redirect('/')}
           style={{ cursor: 'pointer' }}
         >
-          <MantineLogo size={36} />
+          <MantineLogo size={36} type="mark" />
           <Code fw={700}>v3.1.2</Code>
         </Group>
         <UserSearch isSmallScreen={isSmallScreen} />

@@ -31,7 +31,7 @@ export const FeedPage = ({ userId, index, limit, setMorePages }: FeedPageProps) 
   }
 
   return (
-    <SimpleGrid cols={{ base: 1 }}>
+    <SimpleGrid cols={{ base: 1 }} mt="lg">
       {data.data.map((post) => (
         <Post key={post.id} post={post} />
       ))}

@@ -12,13 +12,12 @@ export function Welcome() {
         <h1 className={classes.title}>
           Welcome to{' '}
           <Text component="span" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }} inherit>
-            Mantine
+            Catchup
           </Text>
         </h1>
 
         <Text className={classes.description} c="dimmed">
-          Build fully functional accessible web applications with ease - Mantine includes more than
-          100 customizable components and hooks to cover you in any situation
+          Follow your friends and stay up to date with their latest posts
         </Text>
 
         <Group className={classes.controls}>

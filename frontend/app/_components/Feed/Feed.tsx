@@ -3,7 +3,7 @@ import { FeedPage } from '@/app/_components/Feed/FeedPage/FeedPage';
 import { useFeed } from '@/app/_components/Feed/useFeed';
 import PostModal from '@/components/PostModal/PostModal';
 
-const LIMIT = 4;
+const LIMIT = 3;
 
 export const Feed = () => {
   const { user, page, setMorePages, loadMoreRef, postId } = useFeed();
@@ -17,9 +17,9 @@ export const Feed = () => {
   }
 
   return (
-    <Container py="lg" size="xs">
-      {feedPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }} />
+    <Container pb="lg" size="xs">
       {postId && <PostModal postId={postId} />}
+      {feedPages} <div ref={loadMoreRef} style={{ height: '1px', visibility: 'hidden' }} />
     </Container>
   );
 };
