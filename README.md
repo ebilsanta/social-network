@@ -8,7 +8,11 @@ This is a social network application built to explore and learn various modern w
 - View a curated feed of posts
 - Receive notifications for new followers and posts
 
-Some of the following parts are still in progress, such as the uploading of posts, user login using Firebase (or some Google integration), and developing a frontend.
+Some of the following parts are still in progress, such as the uploading of posts, sending of notifications and developing the frontend.
+
+## Demo
+As I am still working on developing the frontend, I haven't had time to deploy the whole project. Below is a demo video showcasing the current frontend with full backend integration:
+https://github.com/user-attachments/assets/87613904-29c0-4e5a-8f52-e8050edc98fd
 
 ## Architecture
 Below is a high-level system design diagram that outlines the key components of the application architecture:
